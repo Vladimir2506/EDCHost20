@@ -12,6 +12,7 @@ using OpenCvSharp;
 using System.Threading;
 using OpenCvSharp.Extensions;
 using Point2i = OpenCvSharp.Point;
+using Cuda = OpenCvSharp.Cuda;
 
 namespace EDCHost20
 {
@@ -229,7 +230,7 @@ namespace EDCHost20
         }
     }
 
-    public class CoordinateConverter: IDisposable
+    public class CoordinateConverter : IDisposable
     {
         private Mat cam2logic;
         private Point2f[] logicCorners;
@@ -237,11 +238,11 @@ namespace EDCHost20
 
         protected virtual void Dispose(bool disposing)
         {
-            if(disposing)
+            if (disposing)
             {
                 ((IDisposable)(cam2logic)).Dispose();
             }
-            
+
         }
 
         public void Dispose()
@@ -276,7 +277,7 @@ namespace EDCHost20
             else camCorners = corners;
 
             cam2logic = Cv2.GetPerspectiveTransform(camCorners, logicCorners);
-            
+
         }
 
         public Point2f[] CameraToLogic(Point2f[] ptsCamera)
