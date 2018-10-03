@@ -13,6 +13,7 @@ namespace EDC20HOST
         public const int MaxSize = 300;
         public const int MaxPassenger = 5;
         public const int MinCarryDistance = 5; //最小接送距离
+        public const int BackRound = 50; //回溯回合数
         public int Round { get; set; }//当前回合
         public GameState state { get; set; }
         public Car CarA, CarB;
@@ -48,11 +49,11 @@ namespace EDC20HOST
             MapFile.Position = 54;
             MapFile.Read(buffer, 0, buffer.Length);
             for (int i = 0; i != MaxSize; ++i)
-                for (int j = 0; j != MaxSize; ++j)
-                    if (buffer[(i * MaxSize + j) * 3] > 128)//白色
-                        GameMap[MaxSize - 1 - i, j] = true;
-                    else
-                        GameMap[MaxSize - 1 - i, j] = false;
+               for (int j = 0; j != MaxSize; ++j)
+                 if (buffer[(i * MaxSize + j) * 3] > 128)//白色
+                   GameMap[MaxSize - 1 - i, j] = true;
+              else
+                   GameMap[MaxSize - 1 - i, j] = false;
         }
         public static StartDestDot OppoDots(StartDestDot prevDot)
         {
@@ -97,6 +98,14 @@ namespace EDC20HOST
             {
                 CurrPassengerNumber = 5;
             }
+        }
+        public void CarFoul(Camp c) //车犯规
+        {
+            Pause();
+            if (c == Camp.CampA) CarB.Score += Car.PunishScore;
+            else CarA.Score += Car.PunishScore;
+            Round -= BackRound;
+            if (Round < 0) Round = 0;
         }
         public void Start() //开始比赛
         {
@@ -182,10 +191,7 @@ namespace EDC20HOST
             message[6] = (byte)CarA.Pos.y;
             message[7] = (byte)CarB.Pos.x;
             message[8] = (byte)CarB.Pos.y;
-            message[9] = (byte)((CurrPassengerNumber << 4) | (byte)Passengers[0].Owner);
-            //设置是否强制停止
-            if (CarA.UnderStop) message[9] |= 0x20;
-            if (CarB.UnderStop) message[9] |= 0x10;
+            message[9] = (byte)((CurrPassengerNumber << 2) | (byte)Passengers[0].Owner);
             message[10] = (byte)((byte)Passengers[1].Owner << 6 | (byte)Passengers[2].Owner << 4
                 | (byte)Passengers[3].Owner << 2 | (byte)Passengers[4].Owner);
             for(int i = 0; i != 5; ++i)

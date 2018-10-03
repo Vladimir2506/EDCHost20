@@ -14,14 +14,16 @@ using OpenCvSharp.Extensions;
 using Point2i = OpenCvSharp.Point;
 using Cuda = OpenCvSharp.Cuda;
 
+using System.Net;
+
 namespace EDC20HOST
 {
     public partial class Tracker : Form
     {
         private MyFlags flags = null;
         private VideoCapture capture = null;
-        private Thread threadCamera = null;
-        private Point2f[] ptsCameraCorners = null;
+        //private Thread threadCamera = null;
+        private Point2f[] ptsShowCorners = null;
         private DateTime timeCamNow;
         private DateTime timeCamPrev;
         private TextBox[] tbsPoint = null;
@@ -30,6 +32,8 @@ namespace EDC20HOST
         private Point2i car1;
         private Point2i car2;
         private Game game;
+
+        private CaiNetwork.CaiServer server;
 
         public Dot CarALocation()
         {
@@ -47,19 +51,21 @@ namespace EDC20HOST
         public Tracker()
         {
             InitializeComponent();
-            
+
+            InitialCaiServer();
+            MessageBox.Show("IP is "+ server.getUsedIP().ToString()+"  port is "+ server.getPort().ToString());
+
             tbsPoint = new TextBox[] { tbPoint1, tbPoint2, tbPoint3, tbPoint4 };
             // Init
             flags = new MyFlags();
             flags.Init();
             flags.Start();
-            ptsCameraCorners = new Point2f[4];
-            cc = new CoordinateConverter();
-            cc.SetLogicSize(250, 250);
+            ptsShowCorners = new Point2f[4];
+            cc = new CoordinateConverter(flags);
             localiser = new Localiser();
             capture = new VideoCapture();
            // threadCamera = new Thread(CameraReading);
-            capture.Open(0);
+            capture.Open(1);
             timeCamNow = DateTime.Now;
             timeCamPrev = timeCamNow;
 
@@ -68,14 +74,15 @@ namespace EDC20HOST
 
             buttonStart.Enabled = true;
             buttonPause.Enabled = false;
-            
+            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
+
             Game.LoadMap();
             game = new Game();
 
             if (capture.IsOpened())
             {
-                capture.FrameWidth = 800;
-                capture.FrameHeight = 600;
+                capture.FrameWidth = flags.cameraSize.Width;
+                capture.FrameHeight = flags.cameraSize.Height;
                 capture.ConvertRgb = true;
                 timer100ms.Interval = 90;
                 timer100ms.Start();
@@ -87,13 +94,20 @@ namespace EDC20HOST
         private void Flush() 
         {
             CameraReading();
-            game.CarA.Pos = CarALocation();
-            game.CarB.Pos = CarBLocation();
+            lock (flags)
+            {
+                game.CarA.Pos.x = flags.posCarA.X;
+                game.CarA.Pos.y = flags.posCarA.Y;
+                game.CarB.Pos.x = flags.posCarB.X;
+                game.CarB.Pos.y = flags.posCarB.Y;
+            }
             game.Update();
             byte[] Message = game.PackMessage();
             string a = BitConverter.ToString(Message, 0);
             labelMsg.Text = a;
             labelRound.Text = Convert.ToString(game.Round);
+            CaiZhuo_SendBytesViaNet(Message);
+            ShowMessage(Message);
         }
 
         private void CameraReading()
@@ -106,6 +120,7 @@ namespace EDC20HOST
             if(control)
             {
                 using (Mat videoFrame = new Mat())
+                using (Mat showFrame = new Mat())
                 {
                     if (capture.Read(videoFrame))
                     {
@@ -114,11 +129,16 @@ namespace EDC20HOST
                             localiser.Locate(videoFrame, flags);
                         }
                         localiser.GetLocations(out car1, out car2);
+                        lock (flags)
+                        {
+                            //...!!!
+                        }
                         timeCamNow = DateTime.Now;
                         TimeSpan timeProcess = timeCamNow - timeCamPrev;
                         timeCamPrev = timeCamNow;
+                        Cv2.Resize(videoFrame, showFrame, flags.showSize, 0, 0, InterpolationFlags.Nearest);
                         BeginInvoke(new Action<TimeSpan>(UpdateProcessTime), timeProcess);
-                        BeginInvoke(new Action<Image>(UpdateCameraPicture), BitmapConverter.ToBitmap(videoFrame));
+                        BeginInvoke(new Action<Image>(UpdateCameraPicture), BitmapConverter.ToBitmap(showFrame));
                     }
                     lock (flags)
                     {
@@ -139,8 +159,23 @@ namespace EDC20HOST
             pbCamera.Image = img;
         }
 
+        private void InitialCaiServer()
+        {
+            server = new CaiNetwork.CaiServer(CaiNetwork.util.getIPV4());//不指定端口，CaiServer会自行寻找空闲的端口；由util自动寻找本机的IPV4地址
+            /*
+             * 如果需要知道使用的IP和端口
+             * 可以调用server.getUsedIP(),server.getPort()
+             */
+        }
+
+        private void CaiZhuo_SendBytesViaNet(byte[] Message)
+        {
+            server.GroupSend(Message);
+        }
+
         private void Tracker_FormClosed(object sender, FormClosedEventArgs e)
         {
+            server.DisconnectAll();
             lock (flags)
             {
                 flags.End();
@@ -181,11 +216,11 @@ namespace EDC20HOST
 
             if (xMouse >= 0 && xMouse < widthView && yMouse >= 0 && yMouse < heightView)
             {
-                ptsCameraCorners[idx].X = xMouse;
-                ptsCameraCorners[idx].Y = yMouse;
+                ptsShowCorners[idx].X = xMouse;
+                ptsShowCorners[idx].Y = yMouse;
 
                 tbsPoint[idx].Text = String.Format("({0},{1})", xMouse, yMouse);
-                if (idx == 3) cc.UpdateCorners(ptsCameraCorners);
+                if (idx == 3) cc.UpdateCorners(ptsShowCorners);
             }
         }
 
@@ -239,6 +274,7 @@ namespace EDC20HOST
             game.Start();
             buttonPause.Enabled = true;
             buttonStart.Enabled = false;
+            buttonAFoul.Enabled = buttonBFoul.Enabled = true;
         }
 
         private void buttonPause_Click(object sender, EventArgs e)
@@ -246,9 +282,66 @@ namespace EDC20HOST
             game.Pause();
             buttonPause.Enabled = false;
             buttonStart.Enabled = true;
+            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
         }
 
-         
+        private void ShowMessage(byte[] M) //通过Message显示信息到UI上
+        {
+            int x, y;
+            x = ((M[2] & 0x80) << 1) + M[5];
+            y = ((M[2] & 0x40) << 2) + M[6];
+            labelALocation.Text = $"({x}, {y})";
+            x = ((M[2] & 0x20) << 3) + M[7];
+            y = ((M[2] & 0x10) << 4) + M[8];
+            labelBLocation.Text = $"({x}, {y})";
+            int tx, ty;
+            x = ((M[2] & 0x08) << 5) + M[11];
+            y = ((M[2] & 0x04) << 6) + M[12];
+            tx = ((M[2] & 0x02) << 7) + M[13];
+            ty = ((M[2] & 0x01) << 8) + M[14];
+            label1L.Text = $"({x}, {y}) -> ({tx}, {ty})/{M[9] & 0x03}";
+            x = ((M[3] & 0x80) << 1) + M[15];
+            y = ((M[3] & 0x40) << 2) + M[16];
+            tx = ((M[3] & 0x20) << 3) + M[17];
+            ty = ((M[3] & 0x10) << 4) + M[18];
+            label2L.Text = $"({x}, {y}) -> ({tx}, {ty})/{(M[10] & 0xC0) >> 6}";
+            x = ((M[3] & 0x08) << 5) + M[19];
+            y = ((M[3] & 0x04) << 6) + M[20];
+            tx = ((M[3] & 0x02) << 7) + M[21];
+            ty = ((M[3] & 0x01) << 8) + M[22];
+            label3L.Text = $"({x}, {y}) -> ({tx}, {ty})/{(M[10] & 0x30) >> 4}";
+            x = ((M[4] & 0x80) << 1) + M[23];
+            y = ((M[4] & 0x40) << 2) + M[24];
+            tx = ((M[4] & 0x20) << 3) + M[25];
+            ty = ((M[4] & 0x10) << 4) + M[26];
+            label4L.Text = $"({x}, {y}) -> ({tx}, {ty})/{(M[10] & 0x0C) >> 2}";
+            x = ((M[4] & 0x08) << 5) + M[27];
+            y = ((M[4] & 0x04) << 6) + M[28];
+            tx = ((M[4] & 0x02) << 7) + M[29];
+            ty = ((M[4] & 0x01) << 8) + M[30];
+            label5L.Text = $"({x}, {y}) -> ({tx}, {ty})/{(M[10] & 0x03)}";
+            labelValidP.Text = $"{M[9] >> 2}";
+            labelRound.Text = $"{((M[0] & 0x3F) << 8) + M[1]}";
+            labelState.Text = $"{((M[0] & 0xC0) >> 6)}";
+            labelAScore.Text = $"{(M[33] << 8) + M[34]}/{M[31]}";
+            labelBScore.Text = $"{(M[35] << 8) + M[36]}/{M[32]}";
+        }
+
+        private void buttonAFoul_Click(object sender, EventArgs e)
+        {
+            game.CarFoul(Camp.CampA);
+            buttonStart.Enabled = true;
+            buttonPause.Enabled = false;
+            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
+        }
+
+        private void buttonBFoul_Click(object sender, EventArgs e)
+        {
+            game.CarFoul(Camp.CampB);
+            buttonStart.Enabled = true;
+            buttonPause.Enabled = false;
+            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
+        }
     }
 
     public class MyFlags
@@ -267,11 +360,21 @@ namespace EDC20HOST
             public int areaLower;
         }
         public LocConfigs configs;
+        public OpenCvSharp.Size showSize;
+        public OpenCvSharp.Size cameraSize;
+        public OpenCvSharp.Size logicSize;
+        public Point2i posCarA;
+        public Point2i posCarB;
 
         public void Init()
         {
             running = false;
             configs = new LocConfigs();
+            posCarA = new Point2i();
+            posCarB = new Point2i();
+            showSize = new OpenCvSharp.Size(640, 480);
+            cameraSize = new OpenCvSharp.Size(1280, 960);
+            logicSize = new OpenCvSharp.Size(300, 300);
             clickCount = 0;
         }
 
@@ -289,14 +392,17 @@ namespace EDC20HOST
     public class CoordinateConverter : IDisposable
     {
         private Mat cam2logic;
+        private Mat show2cam;
         private Point2f[] logicCorners;
         private Point2f[] camCorners;
+        private Point2f[] showCorners;
 
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
                 ((IDisposable)(cam2logic)).Dispose();
+                ((IDisposable)(show2cam)).Dispose();
             }
 
         }
@@ -307,33 +413,57 @@ namespace EDC20HOST
             GC.SuppressFinalize(this);
         }
 
-        public CoordinateConverter()
+        public CoordinateConverter(MyFlags myFlags)
         {
             camCorners = new Point2f[4];
             logicCorners = new Point2f[4];
+            showCorners = new Point2f[4];
             cam2logic = new Mat();
-        }
+            show2cam = new Mat();
 
-        public void SetLogicSize(int width, int height)
-        {
             logicCorners[0].X = 0;
             logicCorners[0].Y = 0;
-            logicCorners[1].X = width;
+            logicCorners[1].X = myFlags.logicSize.Width;
             logicCorners[1].Y = 0;
             logicCorners[2].X = 0;
-            logicCorners[2].Y = height;
-            logicCorners[3].X = width;
-            logicCorners[3].Y = height;
+            logicCorners[2].Y = myFlags.logicSize.Height;
+            logicCorners[3].X = myFlags.logicSize.Width;
+            logicCorners[3].Y = myFlags.logicSize.Height;
+
+            showCorners[0].X = 0;
+            showCorners[0].Y = 0;
+            showCorners[1].X = myFlags.showSize.Width;
+            showCorners[1].Y = 0;
+            showCorners[2].X = 0;
+            showCorners[2].Y = myFlags.showSize.Height;
+            showCorners[3].X = myFlags.showSize.Width;
+            showCorners[3].Y = myFlags.showSize.Height;
+
+            camCorners[0].X = 0;
+            camCorners[0].Y = 0;
+            camCorners[1].X = myFlags.cameraSize.Width;
+            camCorners[1].Y = 0;
+            camCorners[2].X = 0;
+            camCorners[2].Y = myFlags.cameraSize.Height;
+            camCorners[3].X = myFlags.cameraSize.Width;
+            camCorners[3].Y = myFlags.cameraSize.Height;
+
+            show2cam = Cv2.GetPerspectiveTransform(showCorners, camCorners);
         }
 
         public void UpdateCorners(Point2f[] corners)
         {
             if (corners == null) return;
             if (corners.Length != 4) return;
-            else camCorners = corners;
+            else showCorners = corners;
 
+            camCorners = Cv2.PerspectiveTransform(showCorners, show2cam);
             cam2logic = Cv2.GetPerspectiveTransform(camCorners, logicCorners);
+        }
 
+        public Point2f[] ShowToCamera(Point2f[] ptsShow)
+        {
+            return Cv2.PerspectiveTransform(ptsShow, show2cam);
         }
 
         public Point2f[] CameraToLogic(Point2f[] ptsCamera)

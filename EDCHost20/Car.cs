@@ -8,14 +8,13 @@ namespace EDC20HOST
 {
     class Car //选手的车
     {
-        public const int PunishScore = 20; //惩罚分数
-        public Dot Pos { get; set; } //位置
+        public const int PunishScore = 100; //惩罚分数
+        public Dot Pos;
         public Camp Who { get; set; } //A or B
         public int Score { get; set; } //当前得分
         public Passenger People { get; set; } //乘客
         public bool UnderStop; //是否正在强制停车
-        public int FoulCnt; //犯规次数统计
-        public int PunishCnt; //惩罚次数
+        public int FoulCnt; //惩罚次数
         public void FinishCarry()
         {
             if (People == null) return; //没有乘客直接返回
@@ -36,11 +35,7 @@ namespace EDC20HOST
         }
         public void Foul() //犯规
         {
-            if((++FoulCnt)%2 == 0) //犯规偶数次
-            {
-                PunishCnt++;
-                Score -= PunishScore;
-            }
+            FoulCnt++;
         }
         public Car(Camp c)
         {
@@ -49,7 +44,7 @@ namespace EDC20HOST
             Score = 0;
             People = null;
             UnderStop = false;
-            FoulCnt = PunishCnt = 0;
+            FoulCnt = 0;
         }
     }
 }
