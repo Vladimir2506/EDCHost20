@@ -83,6 +83,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CaiNetwork\CaiClient.cs" />
+    <Compile Include="CaiNetwork\CaiReadObject.cs" />
+    <Compile Include="CaiNetwork\CaiReadWriteObject.cs" />
+    <Compile Include="CaiNetwork\CaiServer.cs" />
+    <Compile Include="CaiNetwork\util.cs" />
     <Compile Include="Car.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Passenger.cs" />
@@ -132,6 +137,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
