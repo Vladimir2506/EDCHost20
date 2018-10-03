@@ -14,7 +14,7 @@ using OpenCvSharp.Extensions;
 using Point2i = OpenCvSharp.Point;
 using Cuda = OpenCvSharp.Cuda;
 
-namespace EDCHost20
+namespace EDC20HOST
 {
     public partial class Tracker : Form
     {
@@ -29,10 +29,25 @@ namespace EDCHost20
         private Localiser localiser;
         private Point2i car1;
         private Point2i car2;
+        private Game game;
+
+        public Dot CarALocation()
+        {
+            Dot D = new Dot();
+            D.x = car1.X;D.y = car1.Y;
+            return D;
+        }
+        public Dot CarBLocation()
+        {
+            Dot D = new Dot();
+            D.x = car2.X; D.y = car2.Y;
+            return D;
+        }
 
         public Tracker()
         {
             InitializeComponent();
+            
             tbsPoint = new TextBox[] { tbPoint1, tbPoint2, tbPoint3, tbPoint4 };
             // Init
             flags = new MyFlags();
@@ -43,23 +58,42 @@ namespace EDCHost20
             cc.SetLogicSize(250, 250);
             localiser = new Localiser();
             capture = new VideoCapture();
-            threadCamera = new Thread(CameraReading);
-            capture.Open(1);
+           // threadCamera = new Thread(CameraReading);
+            capture.Open(0);
             timeCamNow = DateTime.Now;
             timeCamPrev = timeCamNow;
 
             car1 = new Point2i();
             car2 = new Point2i();
 
+            buttonStart.Enabled = true;
+            buttonPause.Enabled = false;
+            
+            Game.LoadMap();
+            game = new Game();
+
             if (capture.IsOpened())
             {
                 capture.FrameWidth = 800;
                 capture.FrameHeight = 600;
                 capture.ConvertRgb = true;
-                threadCamera.Start();
+                timer100ms.Interval = 90;
+                timer100ms.Start();
                 Cv2.NamedWindow("binary");
             }
 
+        }
+
+        private void Flush() 
+        {
+            CameraReading();
+            game.CarA.Pos = CarALocation();
+            game.CarB.Pos = CarBLocation();
+            game.Update();
+            byte[] Message = game.PackMessage();
+            string a = BitConverter.ToString(Message, 0);
+            labelMsg.Text = a;
+            labelRound.Text = Convert.ToString(game.Round);
         }
 
         private void CameraReading()
@@ -69,7 +103,7 @@ namespace EDCHost20
             {
                 control = flags.running;
             }
-            while (control)
+            if(control)
             {
                 using (Mat videoFrame = new Mat())
                 {
@@ -111,7 +145,8 @@ namespace EDCHost20
             {
                 flags.End();
             }
-            threadCamera.Join();
+            timer100ms.Stop();
+            //threadCamera.Join();
             capture.Release();
         }
 
@@ -193,6 +228,27 @@ namespace EDCHost20
         {
             lock (flags) flags.configs.areaLower = (int)nudAreaL.Value;
         }
+
+        private void timer100ms_Tick(object sender, EventArgs e)
+        {
+            Flush();
+        }
+
+        private void buttonStart_Click(object sender, EventArgs e)
+        {
+            game.Start();
+            buttonPause.Enabled = true;
+            buttonStart.Enabled = false;
+        }
+
+        private void buttonPause_Click(object sender, EventArgs e)
+        {
+            game.Pause();
+            buttonPause.Enabled = false;
+            buttonStart.Enabled = true;
+        }
+
+         
     }
 
     public class MyFlags
