@@ -83,6 +83,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Car.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="Passenger.cs" />
     <Compile Include="Tracker.cs">
       <SubType>Form</SubType>
     </Compile>
