@@ -1,4 +1,4 @@
-﻿namespace EDCHost20
+﻿namespace EDC20HOST
 {
     partial class Tracker
     {
@@ -30,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tbInfo = new System.Windows.Forms.TextBox();
             this.pbCamera = new System.Windows.Forms.PictureBox();
             this.tbPoint1 = new System.Windows.Forms.TextBox();
@@ -53,6 +54,12 @@
             this.lblValueL = new System.Windows.Forms.Label();
             this.nudAreaL = new System.Windows.Forms.NumericUpDown();
             this.lblAreaL = new System.Windows.Forms.Label();
+            this.timer100ms = new System.Windows.Forms.Timer(this.components);
+            this.label1 = new System.Windows.Forms.Label();
+            this.labelRound = new System.Windows.Forms.Label();
+            this.buttonStart = new System.Windows.Forms.Button();
+            this.buttonPause = new System.Windows.Forms.Button();
+            this.labelMsg = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbCamera)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1L)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1H)).BeginInit();
@@ -322,11 +329,67 @@
             this.lblAreaL.TabIndex = 23;
             this.lblAreaL.Text = "AreaL:";
             // 
+            // timer100ms
+            // 
+            this.timer100ms.Tick += new System.EventHandler(this.timer100ms_Tick);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(197, 643);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(87, 15);
+            this.label1.TabIndex = 25;
+            this.label1.Text = "CurrRound:";
+            // 
+            // labelRound
+            // 
+            this.labelRound.AutoSize = true;
+            this.labelRound.Location = new System.Drawing.Point(291, 643);
+            this.labelRound.Name = "labelRound";
+            this.labelRound.Size = new System.Drawing.Size(15, 15);
+            this.labelRound.TabIndex = 26;
+            this.labelRound.Text = "0";
+            // 
+            // buttonStart
+            // 
+            this.buttonStart.Location = new System.Drawing.Point(341, 634);
+            this.buttonStart.Name = "buttonStart";
+            this.buttonStart.Size = new System.Drawing.Size(75, 23);
+            this.buttonStart.TabIndex = 27;
+            this.buttonStart.Text = "Start";
+            this.buttonStart.UseVisualStyleBackColor = true;
+            this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
+            // 
+            // buttonPause
+            // 
+            this.buttonPause.Location = new System.Drawing.Point(422, 634);
+            this.buttonPause.Name = "buttonPause";
+            this.buttonPause.Size = new System.Drawing.Size(75, 23);
+            this.buttonPause.TabIndex = 28;
+            this.buttonPause.Text = "Pause";
+            this.buttonPause.UseVisualStyleBackColor = true;
+            this.buttonPause.Click += new System.EventHandler(this.buttonPause_Click);
+            // 
+            // labelMsg
+            // 
+            this.labelMsg.AutoSize = true;
+            this.labelMsg.Location = new System.Drawing.Point(197, 675);
+            this.labelMsg.Name = "labelMsg";
+            this.labelMsg.Size = new System.Drawing.Size(55, 15);
+            this.labelMsg.TabIndex = 29;
+            this.labelMsg.Text = "label2";
+            // 
             // Tracker
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1032, 703);
+            this.ClientSize = new System.Drawing.Size(1838, 703);
+            this.Controls.Add(this.labelMsg);
+            this.Controls.Add(this.buttonPause);
+            this.Controls.Add(this.buttonStart);
+            this.Controls.Add(this.labelRound);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.nudAreaL);
             this.Controls.Add(this.lblAreaL);
             this.Controls.Add(this.nudValueL);
@@ -391,6 +454,12 @@
         private System.Windows.Forms.Label lblValueL;
         private System.Windows.Forms.NumericUpDown nudAreaL;
         private System.Windows.Forms.Label lblAreaL;
+        private System.Windows.Forms.Timer timer100ms;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelRound;
+        private System.Windows.Forms.Button buttonStart;
+        private System.Windows.Forms.Button buttonPause;
+        private System.Windows.Forms.Label labelMsg;
     }
 }
 
