@@ -295,6 +295,7 @@ namespace EDCHost20
         {
             centres1 = new List<Point2i>();
             centres2 = new List<Point2i>();
+            
         }
 
         public void GetLocations(out Point2i pt1, out Point2i pt2)
