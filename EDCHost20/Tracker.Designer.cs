@@ -693,6 +693,7 @@
             this.Name = "Tracker";
             this.Text = "Tracker";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Tracker_FormClosed);
+            this.Load += new System.EventHandler(this.Tracker_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbCamera)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1L)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1H)).EndInit();
