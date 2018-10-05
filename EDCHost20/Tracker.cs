@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using System.IO;
+
 using OpenCvSharp;
 using System.Threading;
 using OpenCvSharp.Extensions;
@@ -38,13 +40,15 @@ namespace EDC20HOST
         public Dot CarALocation()
         {
             Dot D = new Dot();
-            D.x = car1.X;D.y = car1.Y;
+            D.x = car1.X;
+            D.y = car1.Y;
             return D;
         }
         public Dot CarBLocation()
         {
             Dot D = new Dot();
-            D.x = car2.X; D.y = car2.Y;
+            D.x = car2.X;
+            D.y = car2.Y;
             return D;
         }
 
@@ -65,7 +69,7 @@ namespace EDC20HOST
             localiser = new Localiser();
             capture = new VideoCapture();
            // threadCamera = new Thread(CameraReading);
-            capture.Open(1);
+            capture.Open(0);
             timeCamNow = DateTime.Now;
             timeCamPrev = timeCamNow;
 
@@ -131,7 +135,18 @@ namespace EDC20HOST
                         localiser.GetLocations(out car1, out car2);
                         lock (flags)
                         {
-                            //...!!!
+                            if (flags.calibrated)
+                            {
+                                Point2f[] car12 = { car1, car2 };
+                                Point2f[] carAB = cc.CameraToLogic(car12);
+                                flags.posCarA = carAB[0];
+                                flags.posCarB = carAB[1];
+                            }
+                            else
+                            {
+                                flags.posCarA = car1;
+                                flags.posCarB = car2;
+                            }
                         }
                         timeCamNow = DateTime.Now;
                         TimeSpan timeProcess = timeCamNow - timeCamPrev;
@@ -183,6 +198,11 @@ namespace EDC20HOST
             timer100ms.Stop();
             //threadCamera.Join();
             capture.Release();
+
+            string arrStr = String.Format("{0} {1} {2} {3} {4} {5} {6} {7}", flags.configs.hue1Lower, flags.configs.hue1Upper, flags.configs.hue2Lower
+            , flags.configs.hue2Upper, flags.configs.saturation1Lower, flags.configs.saturation2Lower
+            , flags.configs.valueLower, flags.configs.areaLower);
+            File.WriteAllText("data.txt", arrStr);
         }
 
         private void btnReset_Click(object sender, EventArgs e)
@@ -190,6 +210,7 @@ namespace EDC20HOST
             lock(flags)
             {
                 flags.clickCount = 0;
+                flags.calibrated = false;
             }
 
             foreach(TextBox tb in tbsPoint)
@@ -220,7 +241,7 @@ namespace EDC20HOST
                 ptsShowCorners[idx].Y = yMouse;
 
                 tbsPoint[idx].Text = String.Format("({0},{1})", xMouse, yMouse);
-                if (idx == 3) cc.UpdateCorners(ptsShowCorners);
+                if (idx == 3) cc.UpdateCorners(ptsShowCorners, flags);
             }
         }
 
@@ -342,11 +363,35 @@ namespace EDC20HOST
             buttonPause.Enabled = false;
             buttonAFoul.Enabled = buttonBFoul.Enabled = false;
         }
+
+        private void Tracker_Load(object sender, EventArgs e)
+        {
+            if (File.Exists("data.txt"))
+            {
+                FileStream fsRead = new FileStream("data.txt", FileMode.Open);
+                int fsLen = (int)fsRead.Length;
+                byte[] heByte = new byte[fsLen];
+                int r = fsRead.Read(heByte, 0, heByte.Length);
+                string myStr = System.Text.Encoding.UTF8.GetString(heByte);
+                string[] str = myStr.Split(' ');
+                nudHue1L.Value = (flags.configs.hue1Lower = Convert.ToInt32(str[0]));
+                nudHue1H.Value = (flags.configs.hue1Upper = Convert.ToInt32(str[1]));
+                nudHue2L.Value = (flags.configs.hue2Lower = Convert.ToInt32(str[2]));
+                nudHue2H.Value = (flags.configs.hue2Upper = Convert.ToInt32(str[3]));
+                nudSat1L.Value = (flags.configs.saturation1Lower = Convert.ToInt32(str[4]));
+                nudSat2L.Value = (flags.configs.saturation2Lower = Convert.ToInt32(str[5]));
+                nudValueL.Value = (flags.configs.valueLower = Convert.ToInt32(str[6]));
+                nudAreaL.Value = (flags.configs.areaLower = Convert.ToInt32(str[7]));
+                fsRead.Close();
+            }
+
+        }
     }
 
     public class MyFlags
     {
         public bool running;
+        public bool calibrated;
         public int clickCount;
         public struct LocConfigs
         {
@@ -369,6 +414,7 @@ namespace EDC20HOST
         public void Init()
         {
             running = false;
+            calibrated = false;
             configs = new LocConfigs();
             posCarA = new Point2i();
             posCarB = new Point2i();
@@ -451,7 +497,7 @@ namespace EDC20HOST
             show2cam = Cv2.GetPerspectiveTransform(showCorners, camCorners);
         }
 
-        public void UpdateCorners(Point2f[] corners)
+        public void UpdateCorners(Point2f[] corners, MyFlags myFlags)
         {
             if (corners == null) return;
             if (corners.Length != 4) return;
@@ -459,6 +505,7 @@ namespace EDC20HOST
 
             camCorners = Cv2.PerspectiveTransform(showCorners, show2cam);
             cam2logic = Cv2.GetPerspectiveTransform(camCorners, logicCorners);
+            myFlags.calibrated = true;
         }
 
         public Point2f[] ShowToCamera(Point2f[] ptsShow)
@@ -481,6 +528,7 @@ namespace EDC20HOST
         {
             centres1 = new List<Point2i>();
             centres2 = new List<Point2i>();
+            
         }
 
         public void GetLocations(out Point2i pt1, out Point2i pt2)
@@ -555,3 +603,4 @@ namespace EDC20HOST
         }
     }
 }
+
