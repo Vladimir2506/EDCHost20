@@ -20,7 +20,7 @@ namespace EDC20HOST
             Math.Sqrt((StartPos.x - DestPos.x) * (StartPos.x - DestPos.x) + (StartPos.y - DestPos.y) * (StartPos.y - DestPos.y));
     }
 
-    enum Camp
+    public enum Camp
     {
         None = 0, CampA, CampB
     }
