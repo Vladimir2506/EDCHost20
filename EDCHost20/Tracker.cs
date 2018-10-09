@@ -88,7 +88,7 @@ namespace EDC20HOST
                 capture.FrameWidth = flags.cameraSize.Width;
                 capture.FrameHeight = flags.cameraSize.Height;
                 capture.ConvertRgb = true;
-                timer100ms.Interval = 90;
+                timer100ms.Interval = 900;
                 timer100ms.Start();
                 Cv2.NamedWindow("binary");
             }
@@ -116,11 +116,12 @@ namespace EDC20HOST
                     flags.posPassengerEnd[i].X = game.Passengers[i].StartDestPos.DestPos.x;
                     flags.posPassengerEnd[i].Y = game.Passengers[i].StartDestPos.DestPos.y;
                     flags.passengerState[i] = game.Passengers[i].Owner;
+                    flags.gameState = game.state;
                 }
             }
             byte[] Message = game.PackMessage();
             string a = BitConverter.ToString(Message, 0);
-            labelMsg.Text = a;
+            // labelMsg.Text = a;
             labelRound.Text = Convert.ToString(game.Round);
             CaiZhuo_SendBytesViaNet(Message);
             ShowMessage(Message);
@@ -399,6 +400,32 @@ namespace EDC20HOST
             }
 
         }
+
+        private void button_restart_Click(object sender, EventArgs e)
+        {
+            lock (game) { game = new Game(); }
+            buttonStart.Enabled = true;
+            buttonPause.Enabled = false;
+            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
+        }
+
+        private void buttonChangeScore_Click(object sender, EventArgs e)
+        {
+            int AScore = (int)numericUpDownScoreA.Value;
+            int BScore = (int)numericUpDownScoreB.Value;
+            numericUpDownScoreA.Value = 0;
+            numericUpDownScoreB.Value = 0;
+            lock(game)
+            {
+                game.CarA.Score += AScore;
+                game.CarB.Score += BScore;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            timer100ms.Interval = (int)numericUpDownTime.Value;
+        }
     }
 
     public class MyFlags
@@ -428,6 +455,7 @@ namespace EDC20HOST
         public Point2i[] posPassengerEnd;
         public Camp[] passengerState;
         public int currPassengerNum;
+        public GameState gameState;
 
         public void Init()
         {
@@ -495,6 +523,10 @@ namespace EDC20HOST
             showCorners = new Point2f[4];
             cam2logic = new Mat();
             show2cam = new Mat();
+            logic2show = new Mat();
+            show2logic = new Mat();
+            cam2show = new Mat();
+            logic2cam = new Mat();
 
             logicCorners[0].X = 0;
             logicCorners[0].Y = 0;
@@ -660,33 +692,37 @@ namespace EDC20HOST
                 }
 
                 foreach (Point2i c1 in centres1) Cv2.Circle(mat, c1, 10, new Scalar(0x1b, 0xff, 0xa7), -1);
-                foreach (Point2i c2 in centres2) Cv2.Circle(mat, c2, 10, new Scalar(0x00, 0x00, 0xd5), -1);
-                
-                for (int i = 0; i < localiseFlags.currPassengerNum; ++i)
+                foreach (Point2i c2 in centres2) Cv2.Circle(mat, c2, 10, new Scalar(0x00, 0x98, 0xff), -1);
+                if (localiseFlags.gameState != GameState.Unstart)
                 {
-                    int x1 = localiseFlags.posPassengerEnd[i].X;
-                    int y1 = localiseFlags.posPassengerEnd[i].Y;
-                    int x2 = localiseFlags.posPassengerStart[i].X;
-                    int y2 = localiseFlags.posPassengerStart[i].Y;
-                    int x10 = x1 - 10;
-                    int y10 = y1 - 10;
-                    int x20 = x2 - 10;
-                    int y20 = y2 - 10;
-                    Rect rectDest = new Rect(x10, y10, 20, 20);
-                    Rect rectSrc = new Rect(x20, y20, 20, 20);
-                    switch (localiseFlags.passengerState[i])
+                    for (int i = 0; i < localiseFlags.currPassengerNum; ++i)
                     {
-                        case Camp.CampA:        
-                            Cv2.Rectangle(mat, rectDest, new Scalar(0x00, 0x00, 0xd5), 2);
-                            break;
-                        case Camp.CampB:
-                            Cv2.Rectangle(mat, rectDest, new Scalar(0x00, 0x00, 0xd5), 2);
-                            break;
-                        case Camp.None:
-                            Cv2.Circle(mat, localiseFlags.posPassengerStart[i], 5, new Scalar(0xd8, 0x93, 0xce), -1);
-                            break;
-                        default:
-                            break;
+                        int x1 = localiseFlags.posPassengerEnd[i].X;
+                        int y1 = localiseFlags.posPassengerEnd[i].Y;
+                        int x2 = localiseFlags.posPassengerStart[i].X;
+                        int y2 = localiseFlags.posPassengerStart[i].Y;
+                        int x10 = x1 - 8;
+                        int y10 = y1 - 8;
+                        int x20 = x2 - 8;
+                        int y20 = y2 - 8;
+                        Rect rectDest = new Rect(x10, y10, 16, 16);
+                        Rect rectSrc = new Rect(x20, y20, 16, 16);
+                        switch (localiseFlags.passengerState[i])
+                        {
+                            case Camp.CampA:
+                                Cv2.Rectangle(mat, rectDest, new Scalar(0x1b, 0xff, 0xa7), -1);
+                                break;
+                            case Camp.CampB:
+                                Cv2.Rectangle(mat, rectDest, new Scalar(0x00, 0x98, 0xff), -1);
+                                break;
+                            case Camp.None:
+                                // Cv2.Circle(mat, localiseFlags.posPassengerStart[i], 5, new Scalar(0xd8, 0x93, 0xce), -1);
+                                if (i != 4) Cv2.Rectangle(mat, rectSrc, new Scalar(0xf3, 0x96, 0x21), -1);
+                                else Cv2.Rectangle(mat, rectSrc, new Scalar(0x58, 0xee, 0xff), -1);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
 

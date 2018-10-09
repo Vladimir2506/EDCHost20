@@ -7,7 +7,7 @@ using System.IO;
 
 namespace EDC20HOST
 {
-    enum GameState { Unstart = 0, Normal = 1, Pause = 2, End = 3 };
+    public enum GameState { Unstart = 0, Normal = 1, Pause = 2, End = 3 };
     class Game
     {
         public const int MaxSize = 300;
@@ -21,14 +21,13 @@ namespace EDC20HOST
         public PassengerGenerator Generator { get; set; }
         public int CurrPassengerNumber; //当前乘客数量
         public static bool[,] GameMap = new bool[MaxSize, MaxSize]; //地图信息
-        public static bool PassengerDotValid(Dot dot)//乘客点是否有效->7*7方格均为白色
+        public static bool PassengerDotValid(Dot dot)//乘客点是否有效->13*13方格均为白色
         {
             //return true;
             
-            for (int i = ((dot.x - 4 > 0) ? (dot.x - 4) : 0); i <= ((dot.x + 4 < MaxSize) ? (dot.x + 4) : MaxSize - 1); ++i)
-                for (int j = ((dot.y - 4 > 0) ? (dot.y - 4) : 0); j <= ((dot.y + 4 < MaxSize) ? (dot.y + 4) : MaxSize - 1); ++j)
+            for (int i = ((dot.x - 6 > 0) ? (dot.x - 6) : 0); i <= ((dot.x + 6 < MaxSize) ? (dot.x + 6) : MaxSize - 1); ++i)
+                for (int j = ((dot.y - 6 > 0) ? (dot.y - 6) : 0); j <= ((dot.y + 6 < MaxSize) ? (dot.y + 6) : MaxSize - 1); ++j)
                     if (!GameMap[i, j])
-   
                         return false;
             return true;
         }
@@ -59,10 +58,10 @@ namespace EDC20HOST
         public static StartDestDot OppoDots(StartDestDot prevDot)
         {
             StartDestDot newDots = new StartDestDot();
-            newDots.StartPos.x = MaxSize - prevDot.StartPos.y;
-            newDots.StartPos.y = MaxSize - prevDot.StartPos.x;
-            newDots.DestPos.x = MaxSize - prevDot.DestPos.y;
-            newDots.DestPos.y = MaxSize - prevDot.DestPos.x;
+            newDots.StartPos.x = prevDot.StartPos.y;
+            newDots.StartPos.y = prevDot.StartPos.x;
+            newDots.DestPos.x = prevDot.DestPos.y;
+            newDots.DestPos.y = prevDot.DestPos.x;
             return newDots;
         }
         public double GetDistance(Dot A, Dot B)
@@ -100,12 +99,43 @@ namespace EDC20HOST
                 CurrPassengerNumber = 5;
             }
         }
+        public void NewPassenger(int num) //刷新这一位置的新乘客
+        {
+            StartDestDot temp = new StartDestDot();
+            if (num == 1 || num == 3)
+                temp = Generator.NextA();
+            else if (num == 2 || num == 4)
+                temp = Generator.NextB();
+            else
+                temp = Generator.NextS();
+            Passengers[num - 1] = new Passenger(temp, num == 5, num);
+        }
         public void CarFoul(Camp c) //车犯规
         {
             Pause();
-            if (c == Camp.CampA) CarB.Score += Car.PunishScore;
-            else CarA.Score += Car.PunishScore;
+            if (c == Camp.CampA)
+            {
+                CarB.Score += Car.PunishScore;
+                CarA.FoulCnt++;
+            }
+            else
+            {
+                CarA.Score += Car.PunishScore;
+                CarB.FoulCnt++;
+            }
             Round -= BackRound;
+            if(CarA.People != null)
+            {
+                int currNum = CarA.People.Number;
+                CarA.People = null;
+                NewPassenger(currNum);
+            }
+            if (CarB.People != null)
+            {
+                int currNum = CarB.People.Number;
+                CarB.People = null;
+                NewPassenger(currNum);
+            }
             if (Round < 0) Round = 0;
         }
         public void Start() //开始比赛
@@ -156,36 +186,21 @@ namespace EDC20HOST
                 //下车
                 if (CarA.People != null && GetDistance(CarA.People.StartDestPos.DestPos, CarA.Pos) < MinCarryDistance)
                 {
-                    int nowPassengerNumber = CarA.People.Number - 1; //与序号的差距
+                    int currNum = CarA.People.Number;
                     CarA.FinishCarry();
-                    StartDestDot nextDots;
-                    if (nowPassengerNumber == 1 || nowPassengerNumber == 3) //属于A区
-                        nextDots = Generator.NextA();
-                    else if (nowPassengerNumber == 2 || nowPassengerNumber == 4)//属于B区
-                        nextDots = Generator.NextB();
-                    else
-                        nextDots = Generator.NextS();
-                    Passengers[nowPassengerNumber] = new Passenger(nextDots, nowPassengerNumber == 5, nowPassengerNumber);
+                    NewPassenger(currNum);
                 }
                 if (CarB.People != null && GetDistance(CarB.People.StartDestPos.DestPos, CarB.Pos) < MinCarryDistance)
                 {
-                    int nowPassengerNumber = CarB.People.Number - 1; //与序号的差距
+                    int currNum = CarB.People.Number;
                     CarB.FinishCarry();
-                    StartDestDot nextDots;
-                    if (nowPassengerNumber == 1 || nowPassengerNumber == 3) //属于A区
-                        nextDots = Generator.NextA();
-                    else if (nowPassengerNumber == 2 || nowPassengerNumber == 4)//属于B区
-                        nextDots = Generator.NextB();
-                    else
-                        nextDots = Generator.NextS();
-                    Passengers[nowPassengerNumber] = new Passenger(nextDots, nowPassengerNumber == 5, nowPassengerNumber);
+                    NewPassenger(currNum);
                 }
-                if (Round == 1200) //结束比赛
+                if (Round >= 1200) //结束比赛
                 {
-                    Pause();
+                    End();
                 }
             }
-            else;
             //byte[] message = PackMessage();
             //SendMessage
         } 
