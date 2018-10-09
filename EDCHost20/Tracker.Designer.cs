@@ -58,7 +58,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonPause = new System.Windows.Forms.Button();
-            this.labelMsg = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -85,6 +84,14 @@
             this.labelBScore = new System.Windows.Forms.Label();
             this.buttonAFoul = new System.Windows.Forms.Button();
             this.buttonBFoul = new System.Windows.Forms.Button();
+            this.button_restart = new System.Windows.Forms.Button();
+            this.numericUpDownScoreA = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownScoreB = new System.Windows.Forms.NumericUpDown();
+            this.labelAGetScore = new System.Windows.Forms.Label();
+            this.labelBGetScore = new System.Windows.Forms.Label();
+            this.buttonChangeScore = new System.Windows.Forms.Button();
+            this.numericUpDownTime = new System.Windows.Forms.NumericUpDown();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbCamera)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1L)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1H)).BeginInit();
@@ -94,6 +101,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudSat2L)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudValueL)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAreaL)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownScoreA)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownScoreB)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTime)).BeginInit();
             this.SuspendLayout();
             // 
             // tbInfo
@@ -109,7 +119,7 @@
             // 
             this.pbCamera.Location = new System.Drawing.Point(200, 20);
             this.pbCamera.Name = "pbCamera";
-            this.pbCamera.Size = new System.Drawing.Size(800, 600);
+            this.pbCamera.Size = new System.Drawing.Size(640, 480);
             this.pbCamera.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pbCamera.TabIndex = 2;
             this.pbCamera.TabStop = false;
@@ -361,17 +371,19 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1410, 350);
+            this.label1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.Location = new System.Drawing.Point(1091, 341);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(87, 15);
+            this.label1.Size = new System.Drawing.Size(92, 20);
             this.label1.TabIndex = 25;
             this.label1.Text = "CurrRound:";
             // 
             // buttonStart
             // 
-            this.buttonStart.Location = new System.Drawing.Point(1413, 570);
+            this.buttonStart.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonStart.Location = new System.Drawing.Point(603, 640);
             this.buttonStart.Name = "buttonStart";
-            this.buttonStart.Size = new System.Drawing.Size(75, 23);
+            this.buttonStart.Size = new System.Drawing.Size(80, 35);
             this.buttonStart.TabIndex = 27;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = true;
@@ -379,244 +391,261 @@
             // 
             // buttonPause
             // 
-            this.buttonPause.Location = new System.Drawing.Point(1522, 570);
+            this.buttonPause.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonPause.Location = new System.Drawing.Point(760, 640);
             this.buttonPause.Name = "buttonPause";
-            this.buttonPause.Size = new System.Drawing.Size(75, 23);
+            this.buttonPause.Size = new System.Drawing.Size(80, 35);
             this.buttonPause.TabIndex = 28;
             this.buttonPause.Text = "Pause";
             this.buttonPause.UseVisualStyleBackColor = true;
             this.buttonPause.Click += new System.EventHandler(this.buttonPause_Click);
             // 
-            // labelMsg
-            // 
-            this.labelMsg.AutoSize = true;
-            this.labelMsg.Location = new System.Drawing.Point(197, 682);
-            this.labelMsg.Name = "labelMsg";
-            this.labelMsg.Size = new System.Drawing.Size(55, 15);
-            this.labelMsg.TabIndex = 29;
-            this.labelMsg.Text = "label2";
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(1410, 30);
+            this.label2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2.Location = new System.Drawing.Point(1091, 21);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(75, 15);
+            this.label2.Size = new System.Drawing.Size(80, 20);
             this.label2.TabIndex = 30;
             this.label2.Text = "A车坐标：";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1410, 70);
+            this.label3.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(1091, 61);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(75, 15);
+            this.label3.Size = new System.Drawing.Size(78, 20);
             this.label3.TabIndex = 31;
             this.label3.Text = "B车坐标：";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(1410, 110);
+            this.label4.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label4.Location = new System.Drawing.Point(1091, 101);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(90, 15);
+            this.label4.Size = new System.Drawing.Size(93, 20);
             this.label4.TabIndex = 32;
             this.label4.Text = "乘客1坐标：";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(1410, 150);
+            this.label5.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label5.Location = new System.Drawing.Point(1091, 141);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(90, 15);
+            this.label5.Size = new System.Drawing.Size(93, 20);
             this.label5.TabIndex = 33;
             this.label5.Text = "乘客2坐标：";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(1410, 190);
+            this.label6.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label6.Location = new System.Drawing.Point(1091, 181);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(90, 15);
+            this.label6.Size = new System.Drawing.Size(93, 20);
             this.label6.TabIndex = 34;
             this.label6.Text = "乘客3坐标：";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(1410, 230);
+            this.label7.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label7.Location = new System.Drawing.Point(1091, 221);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(90, 15);
+            this.label7.Size = new System.Drawing.Size(93, 20);
             this.label7.TabIndex = 35;
             this.label7.Text = "乘客4坐标：";
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(1410, 270);
+            this.label8.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label8.Location = new System.Drawing.Point(1091, 261);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(90, 15);
+            this.label8.Size = new System.Drawing.Size(93, 20);
             this.label8.TabIndex = 36;
             this.label8.Text = "乘客5坐标：";
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(1410, 310);
+            this.label9.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label9.Location = new System.Drawing.Point(1091, 301);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(97, 15);
+            this.label9.Size = new System.Drawing.Size(99, 20);
             this.label9.TabIndex = 37;
             this.label9.Text = "有效乘客数：";
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(1410, 390);
+            this.label10.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label10.Location = new System.Drawing.Point(1091, 381);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(82, 15);
+            this.label10.Size = new System.Drawing.Size(84, 20);
             this.label10.TabIndex = 38;
             this.label10.Text = "比赛状态：";
             // 
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(1410, 430);
+            this.label11.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label11.Location = new System.Drawing.Point(1091, 421);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(113, 15);
+            this.label11.Size = new System.Drawing.Size(116, 20);
             this.label11.TabIndex = 39;
             this.label11.Text = "A车得分/犯规：";
             // 
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(1410, 470);
+            this.label12.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label12.Location = new System.Drawing.Point(1091, 461);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(113, 15);
+            this.label12.Size = new System.Drawing.Size(114, 20);
             this.label12.TabIndex = 40;
             this.label12.Text = "B车得分/犯规：";
             // 
             // labelALocation
             // 
             this.labelALocation.AutoSize = true;
-            this.labelALocation.Location = new System.Drawing.Point(1530, 30);
+            this.labelALocation.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelALocation.Location = new System.Drawing.Point(1211, 21);
             this.labelALocation.Name = "labelALocation";
-            this.labelALocation.Size = new System.Drawing.Size(15, 15);
+            this.labelALocation.Size = new System.Drawing.Size(18, 20);
             this.labelALocation.TabIndex = 26;
             this.labelALocation.Text = "0";
             // 
             // labelBLocation
             // 
             this.labelBLocation.AutoSize = true;
-            this.labelBLocation.Location = new System.Drawing.Point(1530, 70);
+            this.labelBLocation.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelBLocation.Location = new System.Drawing.Point(1211, 61);
             this.labelBLocation.Name = "labelBLocation";
-            this.labelBLocation.Size = new System.Drawing.Size(15, 15);
+            this.labelBLocation.Size = new System.Drawing.Size(18, 20);
             this.labelBLocation.TabIndex = 41;
             this.labelBLocation.Text = "0";
             // 
             // label1L
             // 
             this.label1L.AutoSize = true;
-            this.label1L.Location = new System.Drawing.Point(1530, 110);
+            this.label1L.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1L.Location = new System.Drawing.Point(1211, 101);
             this.label1L.Name = "label1L";
-            this.label1L.Size = new System.Drawing.Size(15, 15);
+            this.label1L.Size = new System.Drawing.Size(18, 20);
             this.label1L.TabIndex = 42;
             this.label1L.Text = "0";
             // 
             // label2L
             // 
             this.label2L.AutoSize = true;
-            this.label2L.Location = new System.Drawing.Point(1530, 150);
+            this.label2L.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2L.Location = new System.Drawing.Point(1211, 141);
             this.label2L.Name = "label2L";
-            this.label2L.Size = new System.Drawing.Size(15, 15);
+            this.label2L.Size = new System.Drawing.Size(18, 20);
             this.label2L.TabIndex = 43;
             this.label2L.Text = "0";
             // 
             // label3L
             // 
             this.label3L.AutoSize = true;
-            this.label3L.Location = new System.Drawing.Point(1530, 190);
+            this.label3L.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3L.Location = new System.Drawing.Point(1211, 181);
             this.label3L.Name = "label3L";
-            this.label3L.Size = new System.Drawing.Size(15, 15);
+            this.label3L.Size = new System.Drawing.Size(18, 20);
             this.label3L.TabIndex = 44;
             this.label3L.Text = "0";
             // 
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(1530, 230);
+            this.label17.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label17.Location = new System.Drawing.Point(1211, 221);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(15, 15);
+            this.label17.Size = new System.Drawing.Size(18, 20);
             this.label17.TabIndex = 45;
             this.label17.Text = "0";
             // 
             // label4L
             // 
             this.label4L.AutoSize = true;
-            this.label4L.Location = new System.Drawing.Point(1530, 230);
+            this.label4L.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label4L.Location = new System.Drawing.Point(1211, 221);
             this.label4L.Name = "label4L";
-            this.label4L.Size = new System.Drawing.Size(15, 15);
+            this.label4L.Size = new System.Drawing.Size(18, 20);
             this.label4L.TabIndex = 46;
             this.label4L.Text = "0";
             // 
             // label5L
             // 
             this.label5L.AutoSize = true;
-            this.label5L.Location = new System.Drawing.Point(1530, 270);
+            this.label5L.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label5L.Location = new System.Drawing.Point(1211, 261);
             this.label5L.Name = "label5L";
-            this.label5L.Size = new System.Drawing.Size(15, 15);
+            this.label5L.Size = new System.Drawing.Size(18, 20);
             this.label5L.TabIndex = 47;
             this.label5L.Text = "0";
             // 
             // labelValidP
             // 
             this.labelValidP.AutoSize = true;
-            this.labelValidP.Location = new System.Drawing.Point(1530, 310);
+            this.labelValidP.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelValidP.Location = new System.Drawing.Point(1211, 301);
             this.labelValidP.Name = "labelValidP";
-            this.labelValidP.Size = new System.Drawing.Size(15, 15);
+            this.labelValidP.Size = new System.Drawing.Size(18, 20);
             this.labelValidP.TabIndex = 48;
             this.labelValidP.Text = "0";
             // 
             // labelRound
             // 
             this.labelRound.AutoSize = true;
-            this.labelRound.Location = new System.Drawing.Point(1530, 350);
+            this.labelRound.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelRound.Location = new System.Drawing.Point(1211, 341);
             this.labelRound.Name = "labelRound";
-            this.labelRound.Size = new System.Drawing.Size(15, 15);
+            this.labelRound.Size = new System.Drawing.Size(18, 20);
             this.labelRound.TabIndex = 49;
             this.labelRound.Text = "0";
             // 
             // labelState
             // 
             this.labelState.AutoSize = true;
-            this.labelState.Location = new System.Drawing.Point(1530, 390);
+            this.labelState.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelState.Location = new System.Drawing.Point(1211, 381);
             this.labelState.Name = "labelState";
-            this.labelState.Size = new System.Drawing.Size(15, 15);
+            this.labelState.Size = new System.Drawing.Size(18, 20);
             this.labelState.TabIndex = 50;
             this.labelState.Text = "0";
             // 
             // labelAScore
             // 
             this.labelAScore.AutoSize = true;
-            this.labelAScore.Location = new System.Drawing.Point(1530, 430);
+            this.labelAScore.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelAScore.Location = new System.Drawing.Point(1211, 421);
             this.labelAScore.Name = "labelAScore";
-            this.labelAScore.Size = new System.Drawing.Size(15, 15);
+            this.labelAScore.Size = new System.Drawing.Size(18, 20);
             this.labelAScore.TabIndex = 51;
             this.labelAScore.Text = "0";
             // 
             // labelBScore
             // 
             this.labelBScore.AutoSize = true;
-            this.labelBScore.Location = new System.Drawing.Point(1530, 470);
+            this.labelBScore.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelBScore.Location = new System.Drawing.Point(1211, 461);
             this.labelBScore.Name = "labelBScore";
-            this.labelBScore.Size = new System.Drawing.Size(15, 15);
+            this.labelBScore.Size = new System.Drawing.Size(18, 20);
             this.labelBScore.TabIndex = 52;
             this.labelBScore.Text = "0";
             // 
             // buttonAFoul
             // 
-            this.buttonAFoul.Location = new System.Drawing.Point(1413, 521);
+            this.buttonAFoul.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonAFoul.Location = new System.Drawing.Point(327, 640);
             this.buttonAFoul.Name = "buttonAFoul";
-            this.buttonAFoul.Size = new System.Drawing.Size(75, 23);
+            this.buttonAFoul.Size = new System.Drawing.Size(80, 35);
             this.buttonAFoul.TabIndex = 53;
             this.buttonAFoul.Text = "A犯规";
             this.buttonAFoul.UseVisualStyleBackColor = true;
@@ -624,19 +653,147 @@
             // 
             // buttonBFoul
             // 
-            this.buttonBFoul.Location = new System.Drawing.Point(1522, 521);
+            this.buttonBFoul.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonBFoul.Location = new System.Drawing.Point(458, 640);
             this.buttonBFoul.Name = "buttonBFoul";
-            this.buttonBFoul.Size = new System.Drawing.Size(75, 23);
+            this.buttonBFoul.Size = new System.Drawing.Size(80, 35);
             this.buttonBFoul.TabIndex = 54;
             this.buttonBFoul.Text = "B犯规";
             this.buttonBFoul.UseVisualStyleBackColor = true;
             this.buttonBFoul.Click += new System.EventHandler(this.buttonBFoul_Click);
             // 
+            // button_restart
+            // 
+            this.button_restart.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_restart.Location = new System.Drawing.Point(200, 640);
+            this.button_restart.Name = "button_restart";
+            this.button_restart.Size = new System.Drawing.Size(80, 35);
+            this.button_restart.TabIndex = 56;
+            this.button_restart.Text = "新游戏";
+            this.button_restart.UseVisualStyleBackColor = true;
+            this.button_restart.Click += new System.EventHandler(this.button_restart_Click);
+            // 
+            // numericUpDownScoreA
+            // 
+            this.numericUpDownScoreA.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.numericUpDownScoreA.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownScoreA.Location = new System.Drawing.Point(327, 697);
+            this.numericUpDownScoreA.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownScoreA.Name = "numericUpDownScoreA";
+            this.numericUpDownScoreA.Size = new System.Drawing.Size(75, 27);
+            this.numericUpDownScoreA.TabIndex = 57;
+            // 
+            // numericUpDownScoreB
+            // 
+            this.numericUpDownScoreB.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.numericUpDownScoreB.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownScoreB.Location = new System.Drawing.Point(513, 697);
+            this.numericUpDownScoreB.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownScoreB.Name = "numericUpDownScoreB";
+            this.numericUpDownScoreB.Size = new System.Drawing.Size(75, 27);
+            this.numericUpDownScoreB.TabIndex = 58;
+            // 
+            // labelAGetScore
+            // 
+            this.labelAGetScore.AutoSize = true;
+            this.labelAGetScore.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelAGetScore.Location = new System.Drawing.Point(250, 699);
+            this.labelAGetScore.Name = "labelAGetScore";
+            this.labelAGetScore.Size = new System.Drawing.Size(54, 20);
+            this.labelAGetScore.TabIndex = 59;
+            this.labelAGetScore.Text = "A加分:";
+            // 
+            // labelBGetScore
+            // 
+            this.labelBGetScore.AutoSize = true;
+            this.labelBGetScore.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelBGetScore.Location = new System.Drawing.Point(440, 699);
+            this.labelBGetScore.Name = "labelBGetScore";
+            this.labelBGetScore.Size = new System.Drawing.Size(52, 20);
+            this.labelBGetScore.TabIndex = 60;
+            this.labelBGetScore.Text = "B加分:";
+            // 
+            // buttonChangeScore
+            // 
+            this.buttonChangeScore.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonChangeScore.Location = new System.Drawing.Point(633, 692);
+            this.buttonChangeScore.Name = "buttonChangeScore";
+            this.buttonChangeScore.Size = new System.Drawing.Size(80, 35);
+            this.buttonChangeScore.TabIndex = 61;
+            this.buttonChangeScore.Text = "确定";
+            this.buttonChangeScore.UseVisualStyleBackColor = true;
+            this.buttonChangeScore.Click += new System.EventHandler(this.buttonChangeScore_Click);
+            // 
+            // numericUpDownTime
+            // 
+            this.numericUpDownTime.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.numericUpDownTime.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownTime.Location = new System.Drawing.Point(513, 744);
+            this.numericUpDownTime.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownTime.Minimum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.numericUpDownTime.Name = "numericUpDownTime";
+            this.numericUpDownTime.Size = new System.Drawing.Size(75, 27);
+            this.numericUpDownTime.TabIndex = 62;
+            this.numericUpDownTime.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button1.Location = new System.Drawing.Point(633, 739);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(80, 35);
+            this.button1.TabIndex = 63;
+            this.button1.Text = "确定";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Tracker
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1857, 1055);
+            this.AutoSize = true;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ClientSize = new System.Drawing.Size(1402, 873);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.numericUpDownTime);
+            this.Controls.Add(this.buttonChangeScore);
+            this.Controls.Add(this.labelBGetScore);
+            this.Controls.Add(this.labelAGetScore);
+            this.Controls.Add(this.numericUpDownScoreB);
+            this.Controls.Add(this.numericUpDownScoreA);
+            this.Controls.Add(this.button_restart);
             this.Controls.Add(this.buttonBFoul);
             this.Controls.Add(this.buttonAFoul);
             this.Controls.Add(this.labelBScore);
@@ -662,7 +819,6 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.labelMsg);
             this.Controls.Add(this.buttonPause);
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.labelALocation);
@@ -691,7 +847,7 @@
             this.Controls.Add(this.pbCamera);
             this.Controls.Add(this.tbInfo);
             this.Name = "Tracker";
-            this.Text = "Tracker";
+            this.Text = "EDC20HOST";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Tracker_FormClosed);
             this.Load += new System.EventHandler(this.Tracker_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbCamera)).EndInit();
@@ -703,6 +859,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudSat2L)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudValueL)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAreaL)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownScoreA)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownScoreB)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTime)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -736,7 +895,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button buttonStart;
         private System.Windows.Forms.Button buttonPause;
-        private System.Windows.Forms.Label labelMsg;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
@@ -763,6 +921,14 @@
         private System.Windows.Forms.Label labelBScore;
         private System.Windows.Forms.Button buttonAFoul;
         private System.Windows.Forms.Button buttonBFoul;
+        private System.Windows.Forms.Button button_restart;
+        private System.Windows.Forms.NumericUpDown numericUpDownScoreA;
+        private System.Windows.Forms.NumericUpDown numericUpDownScoreB;
+        private System.Windows.Forms.Label labelAGetScore;
+        private System.Windows.Forms.Label labelBGetScore;
+        private System.Windows.Forms.Button buttonChangeScore;
+        private System.Windows.Forms.NumericUpDown numericUpDownTime;
+        private System.Windows.Forms.Button button1;
     }
 }
 

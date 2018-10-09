@@ -86,15 +86,15 @@ namespace EDC20HOST
                     nextY = NRand.Next(Game.MaxSize);
                     dots.StartPos.x = nextX; dots.StartPos.y = nextY;
                 }
-                while (!Game.PassengerDotValid(dots.StartPos)); //循环得到一个有效的点
+                while ((!Game.PassengerDotValid(dots.StartPos)) || (Math.Abs(nextX - nextY) < 15)); //循环得到一个有效的点，并避免在中线上
                 do
                 {
                     nextX = NRand.Next(Game.MaxSize);
                     nextY = NRand.Next(Game.MaxSize);
                     dots.DestPos.x = nextX; dots.DestPos.y = nextY;
                 }
-                while ((!Game.PassengerDotValid(dots.StartPos)) || dots.Distance < 20); //循环得到一个有效的终点，并且舍弃过近的距离
-                if(dots.StartPos.x + dots.StartPos.y < Game.MaxSize) //下半->A区
+                while ((!Game.PassengerDotValid(dots.DestPos)) || dots.Distance < 20); //循环得到一个有效的终点，并且舍弃过近的距离
+                if(dots.StartPos.x < dots.StartPos.y) //下半->A区
                 {
                     APassenger.Push(dots);
                     BPassenger.Push(Game.OppoDots(dots));
