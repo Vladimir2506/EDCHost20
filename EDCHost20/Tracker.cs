@@ -69,7 +69,7 @@ namespace EDC20HOST
             localiser = new Localiser();
             capture = new VideoCapture();
            // threadCamera = new Thread(CameraReading);
-            capture.Open(0);
+            capture.Open(1);
             timeCamNow = DateTime.Now;
             timeCamPrev = timeCamNow;
 
@@ -106,6 +106,18 @@ namespace EDC20HOST
                 game.CarB.Pos.y = flags.posCarB.Y;
             }
             game.Update();
+            lock(flags)
+            {
+                flags.currPassengerNum = game.CurrPassengerNumber;
+                for(int i = 0;i!=Game.MaxPassenger;++i)
+                {
+                    flags.posPassengerStart[i].X = game.Passengers[i].StartDestPos.StartPos.x;
+                    flags.posPassengerStart[i].Y = game.Passengers[i].StartDestPos.StartPos.y;
+                    flags.posPassengerEnd[i].X = game.Passengers[i].StartDestPos.DestPos.x;
+                    flags.posPassengerEnd[i].Y = game.Passengers[i].StartDestPos.DestPos.y;
+                    flags.passengerState[i] = game.Passengers[i].Owner;
+                }
+            }
             byte[] Message = game.PackMessage();
             string a = BitConverter.ToString(Message, 0);
             labelMsg.Text = a;
@@ -130,6 +142,7 @@ namespace EDC20HOST
                     {
                         lock (flags)
                         {
+                            cc.PassengersFilter(flags);
                             localiser.Locate(videoFrame, flags);
                         }
                         localiser.GetLocations(out car1, out car2);
@@ -411,6 +424,11 @@ namespace EDC20HOST
         public Point2i posCarA;
         public Point2i posCarB;
 
+        public Point2i[] posPassengerStart;
+        public Point2i[] posPassengerEnd;
+        public Camp[] passengerState;
+        public int currPassengerNum;
+
         public void Init()
         {
             running = false;
@@ -422,6 +440,9 @@ namespace EDC20HOST
             cameraSize = new OpenCvSharp.Size(1280, 960);
             logicSize = new OpenCvSharp.Size(300, 300);
             clickCount = 0;
+            posPassengerStart = new Point2i[Game.MaxPassenger];
+            posPassengerEnd = new Point2i[Game.MaxPassenger];
+            passengerState = new Camp[Game.MaxPassenger];
         }
 
         public void Start()
@@ -438,7 +459,11 @@ namespace EDC20HOST
     public class CoordinateConverter : IDisposable
     {
         private Mat cam2logic;
+        private Mat logic2cam;
         private Mat show2cam;
+        private Mat cam2show;
+        private Mat show2logic;
+        private Mat logic2show;
         private Point2f[] logicCorners;
         private Point2f[] camCorners;
         private Point2f[] showCorners;
@@ -448,7 +473,11 @@ namespace EDC20HOST
             if (disposing)
             {
                 ((IDisposable)(cam2logic)).Dispose();
+                ((IDisposable)(logic2cam)).Dispose();
                 ((IDisposable)(show2cam)).Dispose();
+                ((IDisposable)(cam2show)).Dispose();
+                ((IDisposable)(show2logic)).Dispose();
+                ((IDisposable)(logic2show)).Dispose();
             }
 
         }
@@ -495,6 +524,7 @@ namespace EDC20HOST
             camCorners[3].Y = myFlags.cameraSize.Height;
 
             show2cam = Cv2.GetPerspectiveTransform(showCorners, camCorners);
+            cam2show = Cv2.GetPerspectiveTransform(camCorners, showCorners);
         }
 
         public void UpdateCorners(Point2f[] corners, MyFlags myFlags)
@@ -503,8 +533,11 @@ namespace EDC20HOST
             if (corners.Length != 4) return;
             else showCorners = corners;
 
+            logic2show = Cv2.GetPerspectiveTransform(logicCorners, showCorners);
+            show2logic = Cv2.GetPerspectiveTransform(showCorners, logicCorners);
             camCorners = Cv2.PerspectiveTransform(showCorners, show2cam);
             cam2logic = Cv2.GetPerspectiveTransform(camCorners, logicCorners);
+            logic2cam = Cv2.GetPerspectiveTransform(logicCorners, camCorners);
             myFlags.calibrated = true;
         }
 
@@ -513,9 +546,41 @@ namespace EDC20HOST
             return Cv2.PerspectiveTransform(ptsShow, show2cam);
         }
 
+        public Point2f[] CameraToShow(Point2f[] ptsCamera)
+        {
+            return Cv2.PerspectiveTransform(ptsCamera, cam2show);
+        }
+
         public Point2f[] CameraToLogic(Point2f[] ptsCamera)
         {
             return Cv2.PerspectiveTransform(ptsCamera, cam2logic);
+        }
+
+        public Point2f[] LogicToCamera(Point2f[] ptsLogic)
+        {
+            return Cv2.PerspectiveTransform(ptsLogic, logic2cam);
+        }
+
+        public Point2f[] LogicToShow(Point2f[] ptsLogic)
+        {
+            return Cv2.PerspectiveTransform(ptsLogic, logic2show);
+        }
+
+        public Point2f[] ShowToLogic(Point2f[] ptsShow)
+        {
+            return Cv2.PerspectiveTransform(ptsShow, show2logic);
+        }
+
+        public void PassengersFilter(MyFlags flags)
+        {
+            if (!flags.calibrated) return;
+
+            for (int i = 0; i < flags.currPassengerNum; ++i)
+            {
+                Point2f[] res = LogicToCamera(new Point2f[]{ flags.posPassengerStart[i], flags.posPassengerEnd[i]});
+                flags.posPassengerStart[i] = res[0];
+                flags.posPassengerEnd[i] = res[1];
+            }
         }
     }
 
@@ -594,8 +659,36 @@ namespace EDC20HOST
                     centres2.Add(centre);
                 }
 
-                foreach (Point2i c1 in centres1) Cv2.Circle(mat, c1, 10, new Scalar(0, 255, 0), -1);
-                foreach (Point2i c2 in centres2) Cv2.Circle(mat, c2, 10, new Scalar(0, 0, 255), -1);
+                foreach (Point2i c1 in centres1) Cv2.Circle(mat, c1, 10, new Scalar(0x1b, 0xff, 0xa7), -1);
+                foreach (Point2i c2 in centres2) Cv2.Circle(mat, c2, 10, new Scalar(0x00, 0x00, 0xd5), -1);
+                
+                for (int i = 0; i < localiseFlags.currPassengerNum; ++i)
+                {
+                    int x1 = localiseFlags.posPassengerEnd[i].X;
+                    int y1 = localiseFlags.posPassengerEnd[i].Y;
+                    int x2 = localiseFlags.posPassengerStart[i].X;
+                    int y2 = localiseFlags.posPassengerStart[i].Y;
+                    int x10 = x1 - 10;
+                    int y10 = y1 - 10;
+                    int x20 = x2 - 10;
+                    int y20 = y2 - 10;
+                    Rect rectDest = new Rect(x10, y10, 20, 20);
+                    Rect rectSrc = new Rect(x20, y20, 20, 20);
+                    switch (localiseFlags.passengerState[i])
+                    {
+                        case Camp.CampA:        
+                            Cv2.Rectangle(mat, rectDest, new Scalar(0x00, 0x00, 0xd5), 2);
+                            break;
+                        case Camp.CampB:
+                            Cv2.Rectangle(mat, rectDest, new Scalar(0x00, 0x00, 0xd5), 2);
+                            break;
+                        case Camp.None:
+                            Cv2.Circle(mat, localiseFlags.posPassengerStart[i], 5, new Scalar(0xd8, 0x93, 0xce), -1);
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
                 Cv2.Merge(new Mat[] { car1, car2, black }, merged);
                 Cv2.ImShow("binary", merged);

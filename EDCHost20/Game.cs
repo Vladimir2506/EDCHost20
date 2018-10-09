@@ -12,7 +12,7 @@ namespace EDC20HOST
     {
         public const int MaxSize = 300;
         public const int MaxPassenger = 5;
-        public const int MinCarryDistance = 5; //最小接送距离
+        public const int MinCarryDistance = 8; //最小接送距离
         public const int BackRound = 50; //回溯回合数
         public int Round { get; set; }//当前回合
         public GameState state { get; set; }
@@ -24,12 +24,13 @@ namespace EDC20HOST
         public static bool PassengerDotValid(Dot dot)//乘客点是否有效->7*7方格均为白色
         {
             //return true;
-            bool flag = true;
-            for (int i = ((dot.x - 3 > 0) ? (dot.x - 3) : 0); i <= ((dot.x + 3 < MaxSize) ? (dot.x + 3) : MaxSize - 1); ++i)
-                for (int j = ((dot.y - 3 > 0) ? (dot.y - 3) : 0); j <= ((dot.y + 3 < MaxSize) ? (dot.y + 3) : MaxSize - 1); ++j)
+            
+            for (int i = ((dot.x - 4 > 0) ? (dot.x - 4) : 0); i <= ((dot.x + 4 < MaxSize) ? (dot.x + 4) : MaxSize - 1); ++i)
+                for (int j = ((dot.y - 4 > 0) ? (dot.y - 4) : 0); j <= ((dot.y + 4 < MaxSize) ? (dot.y + 4) : MaxSize - 1); ++j)
                     if (!GameMap[i, j])
-                        flag = false;
-            return flag;
+   
+                        return false;
+            return true;
         }
         public static bool CarDotValid(Dot dot)//车点是否有效->3*3方格白色大于4
         {
@@ -81,7 +82,7 @@ namespace EDC20HOST
             Passengers[1] = new Passenger(Generator.NextB(), false, 2);
             Passengers[2] = new Passenger(Generator.NextA(), false, 3);
             Passengers[3] = new Passenger(Generator.NextB(), false, 4);
-            Passengers[4] = new Passenger(Generator.NextA(), true, 5);
+            Passengers[4] = new Passenger(Generator.NextS(), true, 5);
             CheckPassengerNumber();
         }
         protected void CheckPassengerNumber() //根据回合数更改最大乘客数量
@@ -110,10 +111,14 @@ namespace EDC20HOST
         public void Start() //开始比赛
         {
             state = GameState.Normal;
+            CarA.Start();
+            CarB.Start();
         }
         public void Pause() //暂停比赛
         {
             state = GameState.Pause;
+            CarA.Stop();
+            CarB.Stop();
         }
         public void End() //结束比赛
         {
@@ -127,8 +132,8 @@ namespace EDC20HOST
                 //GetInfoFromCameraAndUpdate();
                 CheckPassengerNumber();
                 #region PunishmentPhase
-                if (!CarDotValid(CarA.Pos)) CarA.Stop();
-                if (!CarDotValid(CarB.Pos)) CarB.Stop();
+                //if (!CarDotValid(CarA.Pos)) CarA.Stop();
+                //if (!CarDotValid(CarB.Pos)) CarB.Stop();
                 #endregion
 
                 //上车
@@ -153,6 +158,19 @@ namespace EDC20HOST
                 {
                     int nowPassengerNumber = CarA.People.Number - 1; //与序号的差距
                     CarA.FinishCarry();
+                    StartDestDot nextDots;
+                    if (nowPassengerNumber == 1 || nowPassengerNumber == 3) //属于A区
+                        nextDots = Generator.NextA();
+                    else if (nowPassengerNumber == 2 || nowPassengerNumber == 4)//属于B区
+                        nextDots = Generator.NextB();
+                    else
+                        nextDots = Generator.NextS();
+                    Passengers[nowPassengerNumber] = new Passenger(nextDots, nowPassengerNumber == 5, nowPassengerNumber);
+                }
+                if (CarB.People != null && GetDistance(CarB.People.StartDestPos.DestPos, CarB.Pos) < MinCarryDistance)
+                {
+                    int nowPassengerNumber = CarB.People.Number - 1; //与序号的差距
+                    CarB.FinishCarry();
                     StartDestDot nextDots;
                     if (nowPassengerNumber == 1 || nowPassengerNumber == 3) //属于A区
                         nextDots = Generator.NextA();
