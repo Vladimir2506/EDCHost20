@@ -10,7 +10,7 @@ namespace EDC20HOST
     public enum GameState { Unstart = 0, Normal = 1, Pause = 2, End = 3 };
     class Game
     {
-        public const int MaxSize = 300;
+        public const int MaxSize = 270;
         public const int MaxPassenger = 5;
         public const int MinCarryDistance = 8; //最小接送距离
         public const int BackRound = 50; //回溯回合数

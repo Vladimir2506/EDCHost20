@@ -69,7 +69,7 @@ namespace EDC20HOST
             localiser = new Localiser();
             capture = new VideoCapture();
            // threadCamera = new Thread(CameraReading);
-            capture.Open(1);
+            capture.Open(0);
             timeCamNow = DateTime.Now;
             timeCamPrev = timeCamNow;
 
@@ -88,7 +88,7 @@ namespace EDC20HOST
                 capture.FrameWidth = flags.cameraSize.Width;
                 capture.FrameHeight = flags.cameraSize.Height;
                 capture.ConvertRgb = true;
-                timer100ms.Interval = 900;
+                timer100ms.Interval = 75;
                 timer100ms.Start();
                 Cv2.NamedWindow("binary");
             }
@@ -466,7 +466,7 @@ namespace EDC20HOST
             posCarB = new Point2i();
             showSize = new OpenCvSharp.Size(640, 480);
             cameraSize = new OpenCvSharp.Size(1280, 960);
-            logicSize = new OpenCvSharp.Size(300, 300);
+            logicSize = new OpenCvSharp.Size(270, 270);
             clickCount = 0;
             posPassengerStart = new Point2i[Game.MaxPassenger];
             posPassengerEnd = new Point2i[Game.MaxPassenger];
