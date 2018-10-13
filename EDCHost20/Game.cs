@@ -24,9 +24,10 @@ namespace EDC20HOST
         public static bool PassengerDotValid(Dot dot)//乘客点是否有效->13*13方格均为白色
         {
             //return true;
-            
-            for (int i = ((dot.x - 6 > 0) ? (dot.x - 6) : 0); i <= ((dot.x + 6 < MaxSize) ? (dot.x + 6) : MaxSize - 1); ++i)
-                for (int j = ((dot.y - 6 > 0) ? (dot.y - 6) : 0); j <= ((dot.y + 6 < MaxSize) ? (dot.y + 6) : MaxSize - 1); ++j)
+            int margin = 6;
+            if (dot.x < margin || dot.x > MaxSize - margin || dot.y < margin || dot.y > MaxSize - margin) return false;
+            for (int i = ((dot.x - margin > 0) ? (dot.x - margin) : 0); i <= ((dot.x + margin < MaxSize) ? (dot.x + margin) : MaxSize - 1); ++i)
+                for (int j = ((dot.y - margin > 0) ? (dot.y - margin) : 0); j <= ((dot.y + margin < MaxSize) ? (dot.y + margin) : MaxSize - 1); ++j)
                     if (!GameMap[i, j])
                         return false;
             return true;
@@ -44,16 +45,16 @@ namespace EDC20HOST
         }
         public static void LoadMap()//读取地图文件
         {
-            FileStream MapFile = File.OpenRead("map.bmp");
+            FileStream MapFile = File.OpenRead("../../map/map270.bmp");
             byte[] buffer = new byte[MapFile.Length - 54]; //存储图片文件
             MapFile.Position = 54;
             MapFile.Read(buffer, 0, buffer.Length);
             for (int i = 0; i != MaxSize; ++i)
                for (int j = 0; j != MaxSize; ++j)
-                 if (buffer[(i * MaxSize + j) * 3] > 128)//白色
-                   GameMap[MaxSize - 1 - i, j] = true;
+                 if (buffer[(i * MaxSize + j) * 3 + 2*i] > 128)//白色
+                   GameMap[i, j] = true;
               else
-                   GameMap[MaxSize - 1 - i, j] = false;
+                   GameMap[i, j] = false;
         }
         public static StartDestDot OppoDots(StartDestDot prevDot)
         {

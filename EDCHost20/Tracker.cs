@@ -69,7 +69,7 @@ namespace EDC20HOST
             localiser = new Localiser();
             capture = new VideoCapture();
            // threadCamera = new Thread(CameraReading);
-            capture.Open(0);
+            capture.Open(1);
             timeCamNow = DateTime.Now;
             timeCamPrev = timeCamNow;
 
