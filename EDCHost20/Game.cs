@@ -12,7 +12,7 @@ namespace EDC20HOST
     {
         public const int MaxSize = 270;
         public const int MaxPassenger = 5;
-        public const int MinCarryDistance = 8; //最小接送距离
+        public const int MinCarryDistance = 10; //最小接送距离
         public const int BackRound = 50; //回溯回合数
         public int Round { get; set; }//当前回合
         public GameState state { get; set; }
