@@ -26,7 +26,7 @@ namespace EDC20HOST
     }
     class Passenger
     {
-        private static int[] distanceLevel = new int[5] { 0, 50, 150, 250, 400 };
+        private static int[] distanceLevel = new int[5] { 0, 68, 158, 270, 381 };
         private static int[] scoreLevel = new int[4] { 20, 40, 80, 100 };
         public StartDestDot StartDestPos { get; set; } //起点
         public Camp Owner { get; set; }  //所有者
@@ -46,7 +46,7 @@ namespace EDC20HOST
                 }
                 else continue;
             if (score == 0) throw new System.IndexOutOfRangeException("Score为0");
-            if (Special) score *= 2;
+            if (Special) score = score * 3 / 2;
             return score;
         }
         public Passenger(StartDestDot startDestDot, bool special, int number)
