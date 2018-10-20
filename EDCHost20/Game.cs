@@ -111,7 +111,7 @@ namespace EDC20HOST
                 temp = Generator.NextS();
             Passengers[num - 1] = new Passenger(temp, num == 5, num);
         }
-        public void CarFoul(Camp c) //车犯规
+        /*public void CarFoul(Camp c) //车犯规
         {
             Pause();
             if (c == Camp.CampA)
@@ -138,7 +138,7 @@ namespace EDC20HOST
                 NewPassenger(currNum);
             }
             if (Round < 0) Round = 0;
-        }
+        }*/
         public void Start() //开始比赛
         {
             state = GameState.Normal;

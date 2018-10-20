@@ -78,7 +78,7 @@ namespace EDC20HOST
 
             buttonStart.Enabled = true;
             buttonPause.Enabled = false;
-            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
+            button_reset.Enabled = false;
 
             Game.LoadMap();
             game = new Game();
@@ -309,7 +309,7 @@ namespace EDC20HOST
             game.Start();
             buttonPause.Enabled = true;
             buttonStart.Enabled = false;
-            buttonAFoul.Enabled = buttonBFoul.Enabled = true;
+            button_reset.Enabled = true;
         }
 
         private void buttonPause_Click(object sender, EventArgs e)
@@ -317,7 +317,7 @@ namespace EDC20HOST
             game.Pause();
             buttonPause.Enabled = false;
             buttonStart.Enabled = true;
-            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
+            button_reset.Enabled = false;
         }
 
         private void ShowMessage(byte[] M) //通过Message显示信息到UI上
@@ -362,22 +362,6 @@ namespace EDC20HOST
             labelBScore.Text = $"{(M[35] << 8) + M[36]}/{M[32]}";
         }
 
-        private void buttonAFoul_Click(object sender, EventArgs e)
-        {
-            game.CarFoul(Camp.CampA);
-            buttonStart.Enabled = true;
-            buttonPause.Enabled = false;
-            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
-        }
-
-        private void buttonBFoul_Click(object sender, EventArgs e)
-        {
-            game.CarFoul(Camp.CampB);
-            buttonStart.Enabled = true;
-            buttonPause.Enabled = false;
-            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
-        }
-
         private void Tracker_Load(object sender, EventArgs e)
         {
             if (File.Exists("data.txt"))
@@ -406,7 +390,7 @@ namespace EDC20HOST
             lock (game) { game = new Game(); }
             buttonStart.Enabled = true;
             buttonPause.Enabled = false;
-            buttonAFoul.Enabled = buttonBFoul.Enabled = false;
+            button_reset.Enabled = false;
         }
 
         private void buttonChangeScore_Click(object sender, EventArgs e)
@@ -425,6 +409,93 @@ namespace EDC20HOST
         private void button1_Click(object sender, EventArgs e)
         {
             timer100ms.Interval = (int)numericUpDownTime.Value;
+        }
+
+        private void radioButton_CarA_CheckedChanged(object sender, EventArgs e)
+        {
+            radioButton_CarB.Checked = false;
+        }
+
+        private void radioButton_CarB_CheckedChanged(object sender, EventArgs e)
+        {
+            radioButton_CarA.Checked = false;
+        }
+
+        private void button_minus10_Click(object sender, EventArgs e)
+        {
+            lock (game)
+            {
+                if (radioButton_CarA.Checked)
+                {
+                    game.CarA.Score -= 10;
+                }
+                if (radioButton_CarB.Checked)
+                    game.CarB.Score -= 10;
+            }  
+        }
+
+        private void button_minus20_Click(object sender, EventArgs e)
+        {
+            lock (game)
+            {
+                if (radioButton_CarA.Checked)
+                    game.CarA.Score -= 20;
+                if (radioButton_CarB.Checked)
+                    game.CarB.Score -= 20;
+            }
+        }
+
+        private void button_minus80_Click(object sender, EventArgs e)
+        {
+            lock (game)
+            {
+                if (radioButton_CarA.Checked)
+                    game.CarA.Score -= 80;
+                if (radioButton_CarB.Checked)
+                    game.CarB.Score -= 80;
+            }
+        }
+
+        private void button_plus50_Click(object sender, EventArgs e)
+        {
+            lock (game)
+            {
+                if (radioButton_CarA.Checked)
+                    game.CarA.Score += 50;
+                if (radioButton_CarB.Checked)
+                    game.CarB.Score += 50;
+            }
+        }
+
+        private void button_plus100_Click(object sender, EventArgs e)
+        {
+            lock (game)
+            {
+                if (radioButton_CarA.Checked)
+                    game.CarA.Score += 100;
+                if (radioButton_CarB.Checked)
+                    game.CarB.Score += 100;
+            }
+        }
+
+        private void button_plus150_Click(object sender, EventArgs e)
+        {
+            lock (game)
+            {
+                if (radioButton_CarA.Checked)
+                    game.CarA.Score += 150;
+                if (radioButton_CarB.Checked)
+                    game.CarB.Score += 150;
+            }
+        }
+
+        private void button_reset_Click(object sender, EventArgs e)
+        {
+            game.Pause();
+            game.Round -= 50; //复位5s
+            buttonPause.Enabled = false;
+            buttonStart.Enabled = true;
+            button_reset.Enabled = false;
         }
     }
 
