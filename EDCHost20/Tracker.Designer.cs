@@ -82,8 +82,6 @@
             this.labelState = new System.Windows.Forms.Label();
             this.labelAScore = new System.Windows.Forms.Label();
             this.labelBScore = new System.Windows.Forms.Label();
-            this.buttonAFoul = new System.Windows.Forms.Button();
-            this.buttonBFoul = new System.Windows.Forms.Button();
             this.button_restart = new System.Windows.Forms.Button();
             this.numericUpDownScoreA = new System.Windows.Forms.NumericUpDown();
             this.numericUpDownScoreB = new System.Windows.Forms.NumericUpDown();
@@ -92,6 +90,15 @@
             this.buttonChangeScore = new System.Windows.Forms.Button();
             this.numericUpDownTime = new System.Windows.Forms.NumericUpDown();
             this.button1 = new System.Windows.Forms.Button();
+            this.button_minus10 = new System.Windows.Forms.Button();
+            this.button_minus20 = new System.Windows.Forms.Button();
+            this.button_minus80 = new System.Windows.Forms.Button();
+            this.button_plus50 = new System.Windows.Forms.Button();
+            this.button_plus100 = new System.Windows.Forms.Button();
+            this.button_plus150 = new System.Windows.Forms.Button();
+            this.radioButton_CarA = new System.Windows.Forms.RadioButton();
+            this.radioButton_CarB = new System.Windows.Forms.RadioButton();
+            this.button_reset = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbCamera)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1L)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1H)).BeginInit();
@@ -640,28 +647,6 @@
             this.labelBScore.TabIndex = 52;
             this.labelBScore.Text = "0";
             // 
-            // buttonAFoul
-            // 
-            this.buttonAFoul.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonAFoul.Location = new System.Drawing.Point(327, 640);
-            this.buttonAFoul.Name = "buttonAFoul";
-            this.buttonAFoul.Size = new System.Drawing.Size(80, 35);
-            this.buttonAFoul.TabIndex = 53;
-            this.buttonAFoul.Text = "A犯规";
-            this.buttonAFoul.UseVisualStyleBackColor = true;
-            this.buttonAFoul.Click += new System.EventHandler(this.buttonAFoul_Click);
-            // 
-            // buttonBFoul
-            // 
-            this.buttonBFoul.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonBFoul.Location = new System.Drawing.Point(458, 640);
-            this.buttonBFoul.Name = "buttonBFoul";
-            this.buttonBFoul.Size = new System.Drawing.Size(80, 35);
-            this.buttonBFoul.TabIndex = 54;
-            this.buttonBFoul.Text = "B犯规";
-            this.buttonBFoul.UseVisualStyleBackColor = true;
-            this.buttonBFoul.Click += new System.EventHandler(this.buttonBFoul_Click);
-            // 
             // button_restart
             // 
             this.button_restart.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -681,7 +666,7 @@
             0,
             0,
             0});
-            this.numericUpDownScoreA.Location = new System.Drawing.Point(327, 697);
+            this.numericUpDownScoreA.Location = new System.Drawing.Point(843, 799);
             this.numericUpDownScoreA.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -699,7 +684,7 @@
             0,
             0,
             0});
-            this.numericUpDownScoreB.Location = new System.Drawing.Point(513, 697);
+            this.numericUpDownScoreB.Location = new System.Drawing.Point(1029, 799);
             this.numericUpDownScoreB.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -713,7 +698,7 @@
             // 
             this.labelAGetScore.AutoSize = true;
             this.labelAGetScore.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.labelAGetScore.Location = new System.Drawing.Point(250, 699);
+            this.labelAGetScore.Location = new System.Drawing.Point(766, 801);
             this.labelAGetScore.Name = "labelAGetScore";
             this.labelAGetScore.Size = new System.Drawing.Size(54, 20);
             this.labelAGetScore.TabIndex = 59;
@@ -723,7 +708,7 @@
             // 
             this.labelBGetScore.AutoSize = true;
             this.labelBGetScore.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.labelBGetScore.Location = new System.Drawing.Point(440, 699);
+            this.labelBGetScore.Location = new System.Drawing.Point(956, 801);
             this.labelBGetScore.Name = "labelBGetScore";
             this.labelBGetScore.Size = new System.Drawing.Size(52, 20);
             this.labelBGetScore.TabIndex = 60;
@@ -732,7 +717,7 @@
             // buttonChangeScore
             // 
             this.buttonChangeScore.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonChangeScore.Location = new System.Drawing.Point(633, 692);
+            this.buttonChangeScore.Location = new System.Drawing.Point(1149, 794);
             this.buttonChangeScore.Name = "buttonChangeScore";
             this.buttonChangeScore.Size = new System.Drawing.Size(80, 35);
             this.buttonChangeScore.TabIndex = 61;
@@ -779,6 +764,107 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // button_minus10
+            // 
+            this.button_minus10.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_minus10.Location = new System.Drawing.Point(1063, 657);
+            this.button_minus10.Name = "button_minus10";
+            this.button_minus10.Size = new System.Drawing.Size(80, 35);
+            this.button_minus10.TabIndex = 64;
+            this.button_minus10.Text = "-10";
+            this.button_minus10.UseVisualStyleBackColor = true;
+            this.button_minus10.Click += new System.EventHandler(this.button_minus10_Click);
+            // 
+            // button_minus20
+            // 
+            this.button_minus20.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_minus20.Location = new System.Drawing.Point(1063, 697);
+            this.button_minus20.Name = "button_minus20";
+            this.button_minus20.Size = new System.Drawing.Size(80, 35);
+            this.button_minus20.TabIndex = 65;
+            this.button_minus20.Text = "-20";
+            this.button_minus20.UseVisualStyleBackColor = true;
+            this.button_minus20.Click += new System.EventHandler(this.button_minus20_Click);
+            // 
+            // button_minus80
+            // 
+            this.button_minus80.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_minus80.Location = new System.Drawing.Point(1063, 738);
+            this.button_minus80.Name = "button_minus80";
+            this.button_minus80.Size = new System.Drawing.Size(80, 35);
+            this.button_minus80.TabIndex = 66;
+            this.button_minus80.Text = "-80";
+            this.button_minus80.UseVisualStyleBackColor = true;
+            this.button_minus80.Click += new System.EventHandler(this.button_minus80_Click);
+            // 
+            // button_plus50
+            // 
+            this.button_plus50.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_plus50.Location = new System.Drawing.Point(1149, 656);
+            this.button_plus50.Name = "button_plus50";
+            this.button_plus50.Size = new System.Drawing.Size(80, 35);
+            this.button_plus50.TabIndex = 67;
+            this.button_plus50.Text = "+50";
+            this.button_plus50.UseVisualStyleBackColor = true;
+            this.button_plus50.Click += new System.EventHandler(this.button_plus50_Click);
+            // 
+            // button_plus100
+            // 
+            this.button_plus100.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_plus100.Location = new System.Drawing.Point(1149, 697);
+            this.button_plus100.Name = "button_plus100";
+            this.button_plus100.Size = new System.Drawing.Size(80, 35);
+            this.button_plus100.TabIndex = 68;
+            this.button_plus100.Text = "+100";
+            this.button_plus100.UseVisualStyleBackColor = true;
+            this.button_plus100.Click += new System.EventHandler(this.button_plus100_Click);
+            // 
+            // button_plus150
+            // 
+            this.button_plus150.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_plus150.Location = new System.Drawing.Point(1149, 738);
+            this.button_plus150.Name = "button_plus150";
+            this.button_plus150.Size = new System.Drawing.Size(80, 35);
+            this.button_plus150.TabIndex = 69;
+            this.button_plus150.Text = "+150";
+            this.button_plus150.UseVisualStyleBackColor = true;
+            this.button_plus150.Click += new System.EventHandler(this.button_plus150_Click);
+            // 
+            // radioButton_CarA
+            // 
+            this.radioButton_CarA.AutoSize = true;
+            this.radioButton_CarA.Location = new System.Drawing.Point(1063, 628);
+            this.radioButton_CarA.Name = "radioButton_CarA";
+            this.radioButton_CarA.Size = new System.Drawing.Size(51, 19);
+            this.radioButton_CarA.TabIndex = 70;
+            this.radioButton_CarA.TabStop = true;
+            this.radioButton_CarA.Text = "A车";
+            this.radioButton_CarA.UseVisualStyleBackColor = true;
+            this.radioButton_CarA.CheckedChanged += new System.EventHandler(this.radioButton_CarA_CheckedChanged);
+            // 
+            // radioButton_CarB
+            // 
+            this.radioButton_CarB.AutoSize = true;
+            this.radioButton_CarB.Location = new System.Drawing.Point(1149, 628);
+            this.radioButton_CarB.Name = "radioButton_CarB";
+            this.radioButton_CarB.Size = new System.Drawing.Size(51, 19);
+            this.radioButton_CarB.TabIndex = 71;
+            this.radioButton_CarB.TabStop = true;
+            this.radioButton_CarB.Text = "B车";
+            this.radioButton_CarB.UseVisualStyleBackColor = true;
+            this.radioButton_CarB.CheckedChanged += new System.EventHandler(this.radioButton_CarB_CheckedChanged);
+            // 
+            // button_reset
+            // 
+            this.button_reset.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_reset.Location = new System.Drawing.Point(438, 640);
+            this.button_reset.Name = "button_reset";
+            this.button_reset.Size = new System.Drawing.Size(80, 35);
+            this.button_reset.TabIndex = 72;
+            this.button_reset.Text = "复位";
+            this.button_reset.UseVisualStyleBackColor = true;
+            this.button_reset.Click += new System.EventHandler(this.button_reset_Click);
+            // 
             // Tracker
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -786,6 +872,15 @@
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1402, 873);
+            this.Controls.Add(this.button_reset);
+            this.Controls.Add(this.radioButton_CarB);
+            this.Controls.Add(this.radioButton_CarA);
+            this.Controls.Add(this.button_plus150);
+            this.Controls.Add(this.button_plus100);
+            this.Controls.Add(this.button_plus50);
+            this.Controls.Add(this.button_minus80);
+            this.Controls.Add(this.button_minus20);
+            this.Controls.Add(this.button_minus10);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.numericUpDownTime);
             this.Controls.Add(this.buttonChangeScore);
@@ -794,8 +889,6 @@
             this.Controls.Add(this.numericUpDownScoreB);
             this.Controls.Add(this.numericUpDownScoreA);
             this.Controls.Add(this.button_restart);
-            this.Controls.Add(this.buttonBFoul);
-            this.Controls.Add(this.buttonAFoul);
             this.Controls.Add(this.labelBScore);
             this.Controls.Add(this.labelAScore);
             this.Controls.Add(this.labelState);
@@ -919,8 +1012,6 @@
         private System.Windows.Forms.Label labelState;
         private System.Windows.Forms.Label labelAScore;
         private System.Windows.Forms.Label labelBScore;
-        private System.Windows.Forms.Button buttonAFoul;
-        private System.Windows.Forms.Button buttonBFoul;
         private System.Windows.Forms.Button button_restart;
         private System.Windows.Forms.NumericUpDown numericUpDownScoreA;
         private System.Windows.Forms.NumericUpDown numericUpDownScoreB;
@@ -929,6 +1020,15 @@
         private System.Windows.Forms.Button buttonChangeScore;
         private System.Windows.Forms.NumericUpDown numericUpDownTime;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button_minus10;
+        private System.Windows.Forms.Button button_minus20;
+        private System.Windows.Forms.Button button_minus80;
+        private System.Windows.Forms.Button button_plus50;
+        private System.Windows.Forms.Button button_plus100;
+        private System.Windows.Forms.Button button_plus150;
+        private System.Windows.Forms.RadioButton radioButton_CarA;
+        private System.Windows.Forms.RadioButton radioButton_CarB;
+        private System.Windows.Forms.Button button_reset;
     }
 }
 
