@@ -74,7 +74,7 @@ namespace CaiNetwork
                 //Parent.ComboAddConnected(client.Client.RemoteEndPoint.ToString());
                 CaiReadWriteObject readWriteObject = new CaiReadWriteObject(client);
                 clientList.Add(readWriteObject);
-                SendString(readWriteObject, "服务器已经接受连接！");
+                SendString(readWriteObject, "Connection Accepted!");
                 readWriteObject.netStream.BeginRead(readWriteObject.readBytes, 0, readWriteObject.readBytes.Length, ReadCallback, readWriteObject);
             }
             catch (Exception err)
