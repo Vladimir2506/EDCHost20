@@ -90,7 +90,7 @@ namespace EDC20HOST
                 capture.ConvertRgb = true;
                 timer100ms.Interval = 75;
                 timer100ms.Start();
-                Cv2.NamedWindow("binary");
+                //Cv2.NamedWindow("binary");
             }
 
         }
@@ -497,6 +497,11 @@ namespace EDC20HOST
             buttonStart.Enabled = true;
             button_reset.Enabled = false;
         }
+
+        private void checkBox_DebugMode_CheckedChanged(object sender, EventArgs e)
+        {
+            game.DebugMode = checkBox_DebugMode.Checked;
+        }
     }
 
     public class MyFlags
@@ -722,7 +727,7 @@ namespace EDC20HOST
             using (Mat hsv = new Mat())
             using (Mat car1 = new Mat())
             using (Mat car2 = new Mat())
-            using (Mat merged = new Mat())
+            //using (Mat merged = new Mat())
             using (Mat black = new Mat(mat.Size(), MatType.CV_8UC1))
             {
                 Cv2.CvtColor(mat, hsv, ColorConversionCodes.RGB2HSV);
@@ -797,8 +802,8 @@ namespace EDC20HOST
                     }
                 }
 
-                Cv2.Merge(new Mat[] { car1, car2, black }, merged);
-                Cv2.ImShow("binary", merged);
+                //Cv2.Merge(new Mat[] { car1, car2, black }, merged);
+                //Cv2.ImShow("binary", merged);
             }
         }
     }

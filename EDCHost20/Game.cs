@@ -10,6 +10,7 @@ namespace EDC20HOST
     public enum GameState { Unstart = 0, Normal = 1, Pause = 2, End = 3 };
     class Game
     {
+        public bool DebugMode; //调试模式，最大回合数 = 1,000,000
         public const int MaxSize = 270;
         public const int MaxPassenger = 5;
         public const int MinCarryDistance = 10; //最小接送距离
@@ -84,6 +85,7 @@ namespace EDC20HOST
             Passengers[3] = new Passenger(Generator.NextB(), false, 4);
             Passengers[4] = new Passenger(Generator.NextS(), true, 5);
             CheckPassengerNumber();
+            DebugMode = false;
         }
         protected void CheckPassengerNumber() //根据回合数更改最大乘客数量
         {
@@ -197,7 +199,7 @@ namespace EDC20HOST
                     CarB.FinishCarry();
                     NewPassenger(currNum);
                 }
-                if (Round >= 1200) //结束比赛
+                if ((Round >= 1200 && DebugMode == false) || (Round >= 1000000 && DebugMode == true)) //结束比赛
                 {
                     End();
                 }
