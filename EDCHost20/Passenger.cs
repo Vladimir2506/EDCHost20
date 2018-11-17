@@ -28,7 +28,7 @@ namespace EDC20HOST
     {
         private static int[] distanceLevel = new int[5] { 0, 68, 158, 270, 381 };
         private static int[] scoreLevel = new int[4] { 20, 40, 80, 100 };
-        public StartDestDot StartDestPos { get; set; } //起点
+        public StartDestDot StartDestPos; //起点
         public Camp Owner { get; set; }  //所有者
         public bool Special { get; set; } //特殊乘客
         public int Number { get; set; } //编号
