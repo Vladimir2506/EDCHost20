@@ -36,6 +36,7 @@ namespace EDC20HOST
         private Game game;
 
         private CaiNetwork.CaiServer server;
+        private CaiNetwork.CaiUDP udp;
 
         public Dot CarALocation()
         {
@@ -57,7 +58,9 @@ namespace EDC20HOST
             InitializeComponent();
 
             InitialCaiServer();
-            MessageBox.Show("IP is "+ server.getUsedIP().ToString()+"  port is "+ server.getPort().ToString());
+            MessageBox.Show("TCP IP is "+ server.getUsedIP().ToString()+"  port is "+ server.getPort().ToString());
+            udp = new CaiNetwork.CaiUDP();
+            MessageBox.Show("UDP IP is " + udp.broadcastIpEndPoint.Address.ToString() + "  port is " + udp.broadcastIpEndPoint.Port.ToString());
 
             tbsPoint = new TextBox[] { tbPoint1, tbPoint2, tbPoint3, tbPoint4 };
             // Init
@@ -200,6 +203,7 @@ namespace EDC20HOST
         private void CaiZhuo_SendBytesViaNet(byte[] Message)
         {
             server.GroupSend(Message);
+            udp.sendByte(Message);
         }
 
         private void Tracker_FormClosed(object sender, FormClosedEventArgs e)
