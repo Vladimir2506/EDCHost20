@@ -11,7 +11,7 @@ namespace CaiNetwork
     public class CaiUDP
     {
         UdpClient sendUdpClient;
-        IPEndPoint broadcastIpEndPoint;
+        public IPEndPoint broadcastIpEndPoint;
         //IPAddress localIP;
         int localPort;
         public CaiUDP()
