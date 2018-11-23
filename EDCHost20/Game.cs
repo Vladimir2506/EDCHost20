@@ -22,16 +22,17 @@ namespace EDC20HOST
         public PassengerGenerator Generator { get; set; }
         public int CurrPassengerNumber; //当前乘客数量
         public static bool[,] GameMap = new bool[MaxSize, MaxSize]; //地图信息
-        public static bool PassengerDotValid(Dot dot)//乘客点是否有效->13*13方格均为白色
+        public static bool PassengerDotValid(Dot dot)//新规则直接输出点
         {
             //return true;
-            int margin = 6;
-            if (dot.x < margin || dot.x > MaxSize - margin || dot.y < margin || dot.y > MaxSize - margin) return false;
-            for (int i = ((dot.x - margin > 0) ? (dot.x - margin) : 0); i <= ((dot.x + margin < MaxSize) ? (dot.x + margin) : MaxSize - 1); ++i)
-                for (int j = ((dot.y - margin > 0) ? (dot.y - margin) : 0); j <= ((dot.y + margin < MaxSize) ? (dot.y + margin) : MaxSize - 1); ++j)
-                    if (!GameMap[i, j])
-                        return false;
-            return true;
+            //             int margin = 6;
+            //             if (dot.x < margin || dot.x > MaxSize - margin || dot.y < margin || dot.y > MaxSize - margin) return false;
+            //             for (int i = ((dot.x - margin > 0) ? (dot.x - margin) : 0); i <= ((dot.x + margin < MaxSize) ? (dot.x + margin) : MaxSize - 1); ++i)
+            //                 for (int j = ((dot.y - margin > 0) ? (dot.y - margin) : 0); j <= ((dot.y + margin < MaxSize) ? (dot.y + margin) : MaxSize - 1); ++j)
+            //                     if (!GameMap[i, j])
+            //                         return false;
+            //            return true;
+            return GameMap[dot.x, dot.y];
         }
         public static bool CarDotValid(Dot dot)//车点是否有效->3*3方格白色大于4
         {
@@ -46,7 +47,7 @@ namespace EDC20HOST
         }
         public static void LoadMap()//读取地图文件
         {
-            FileStream MapFile = File.OpenRead("../../map/map270.bmp");
+            FileStream MapFile = File.OpenRead("../../map/map270ver2.bmp");
             byte[] buffer = new byte[MapFile.Length - 54]; //存储图片文件
             MapFile.Position = 54;
             MapFile.Read(buffer, 0, buffer.Length);

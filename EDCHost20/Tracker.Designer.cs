@@ -96,10 +96,12 @@
             this.button_plus50 = new System.Windows.Forms.Button();
             this.button_plus100 = new System.Windows.Forms.Button();
             this.button_plus150 = new System.Windows.Forms.Button();
+            this.button_reset = new System.Windows.Forms.Button();
+            this.groupBox_car = new System.Windows.Forms.GroupBox();
+            this.button_video = new System.Windows.Forms.Button();
+            this.checkBox_DebugMode = new System.Windows.Forms.CheckBox();
             this.radioButton_CarA = new System.Windows.Forms.RadioButton();
             this.radioButton_CarB = new System.Windows.Forms.RadioButton();
-            this.button_reset = new System.Windows.Forms.Button();
-            this.checkBox_DebugMode = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbCamera)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1L)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudHue1H)).BeginInit();
@@ -112,6 +114,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownScoreA)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownScoreB)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTime)).BeginInit();
+            this.groupBox_car.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbInfo
@@ -389,7 +392,7 @@
             // buttonStart
             // 
             this.buttonStart.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonStart.Location = new System.Drawing.Point(603, 640);
+            this.buttonStart.Location = new System.Drawing.Point(466, 640);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(80, 35);
             this.buttonStart.TabIndex = 27;
@@ -400,7 +403,7 @@
             // buttonPause
             // 
             this.buttonPause.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonPause.Location = new System.Drawing.Point(760, 640);
+            this.buttonPause.Location = new System.Drawing.Point(610, 640);
             this.buttonPause.Name = "buttonPause";
             this.buttonPause.Size = new System.Drawing.Size(80, 35);
             this.buttonPause.TabIndex = 28;
@@ -831,42 +834,38 @@
             this.button_plus150.UseVisualStyleBackColor = true;
             this.button_plus150.Click += new System.EventHandler(this.button_plus150_Click);
             // 
-            // radioButton_CarA
-            // 
-            this.radioButton_CarA.AutoSize = true;
-            this.radioButton_CarA.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.radioButton_CarA.Location = new System.Drawing.Point(1063, 628);
-            this.radioButton_CarA.Name = "radioButton_CarA";
-            this.radioButton_CarA.Size = new System.Drawing.Size(56, 24);
-            this.radioButton_CarA.TabIndex = 70;
-            this.radioButton_CarA.TabStop = true;
-            this.radioButton_CarA.Text = "A车";
-            this.radioButton_CarA.UseVisualStyleBackColor = true;
-            this.radioButton_CarA.CheckedChanged += new System.EventHandler(this.radioButton_CarA_CheckedChanged);
-            // 
-            // radioButton_CarB
-            // 
-            this.radioButton_CarB.AutoSize = true;
-            this.radioButton_CarB.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.radioButton_CarB.Location = new System.Drawing.Point(1149, 628);
-            this.radioButton_CarB.Name = "radioButton_CarB";
-            this.radioButton_CarB.Size = new System.Drawing.Size(54, 24);
-            this.radioButton_CarB.TabIndex = 71;
-            this.radioButton_CarB.TabStop = true;
-            this.radioButton_CarB.Text = "B车";
-            this.radioButton_CarB.UseVisualStyleBackColor = true;
-            this.radioButton_CarB.CheckedChanged += new System.EventHandler(this.radioButton_CarB_CheckedChanged);
-            // 
             // button_reset
             // 
             this.button_reset.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_reset.Location = new System.Drawing.Point(438, 640);
+            this.button_reset.Location = new System.Drawing.Point(329, 640);
             this.button_reset.Name = "button_reset";
             this.button_reset.Size = new System.Drawing.Size(80, 35);
             this.button_reset.TabIndex = 72;
             this.button_reset.Text = "复位";
             this.button_reset.UseVisualStyleBackColor = true;
             this.button_reset.Click += new System.EventHandler(this.button_reset_Click);
+            // 
+            // groupBox_car
+            // 
+            this.groupBox_car.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.groupBox_car.Controls.Add(this.radioButton_CarB);
+            this.groupBox_car.Controls.Add(this.radioButton_CarA);
+            this.groupBox_car.Location = new System.Drawing.Point(1040, 579);
+            this.groupBox_car.Name = "groupBox_car";
+            this.groupBox_car.Size = new System.Drawing.Size(200, 52);
+            this.groupBox_car.TabIndex = 73;
+            this.groupBox_car.TabStop = false;
+            // 
+            // button_video
+            // 
+            this.button_video.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_video.Location = new System.Drawing.Point(740, 640);
+            this.button_video.Name = "button_video";
+            this.button_video.Size = new System.Drawing.Size(100, 35);
+            this.button_video.TabIndex = 74;
+            this.button_video.Text = "开始录像";
+            this.button_video.UseVisualStyleBackColor = true;
+            this.button_video.Click += new System.EventHandler(this.button_video_Click);
             // 
             // checkBox_DebugMode
             // 
@@ -880,6 +879,30 @@
             this.checkBox_DebugMode.UseVisualStyleBackColor = true;
             this.checkBox_DebugMode.CheckedChanged += new System.EventHandler(this.checkBox_DebugMode_CheckedChanged);
             // 
+            // radioButton_CarA
+            // 
+            this.radioButton_CarA.AutoSize = true;
+            this.radioButton_CarA.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.radioButton_CarA.Location = new System.Drawing.Point(34, 22);
+            this.radioButton_CarA.Name = "radioButton_CarA";
+            this.radioButton_CarA.Size = new System.Drawing.Size(56, 24);
+            this.radioButton_CarA.TabIndex = 0;
+            this.radioButton_CarA.TabStop = true;
+            this.radioButton_CarA.Text = "A车";
+            this.radioButton_CarA.UseVisualStyleBackColor = true;
+            // 
+            // radioButton_CarB
+            // 
+            this.radioButton_CarB.AutoSize = true;
+            this.radioButton_CarB.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.radioButton_CarB.Location = new System.Drawing.Point(126, 22);
+            this.radioButton_CarB.Name = "radioButton_CarB";
+            this.radioButton_CarB.Size = new System.Drawing.Size(54, 24);
+            this.radioButton_CarB.TabIndex = 1;
+            this.radioButton_CarB.TabStop = true;
+            this.radioButton_CarB.Text = "B车";
+            this.radioButton_CarB.UseVisualStyleBackColor = true;
+            // 
             // Tracker
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -887,10 +910,10 @@
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1402, 703);
+            this.Controls.Add(this.button_video);
+            this.Controls.Add(this.groupBox_car);
             this.Controls.Add(this.checkBox_DebugMode);
             this.Controls.Add(this.button_reset);
-            this.Controls.Add(this.radioButton_CarB);
-            this.Controls.Add(this.radioButton_CarA);
             this.Controls.Add(this.button_plus150);
             this.Controls.Add(this.button_plus100);
             this.Controls.Add(this.button_plus50);
@@ -971,6 +994,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownScoreA)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownScoreB)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTime)).EndInit();
+            this.groupBox_car.ResumeLayout(false);
+            this.groupBox_car.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1042,10 +1067,12 @@
         private System.Windows.Forms.Button button_plus50;
         private System.Windows.Forms.Button button_plus100;
         private System.Windows.Forms.Button button_plus150;
-        private System.Windows.Forms.RadioButton radioButton_CarA;
-        private System.Windows.Forms.RadioButton radioButton_CarB;
         private System.Windows.Forms.Button button_reset;
+        private System.Windows.Forms.GroupBox groupBox_car;
+        private System.Windows.Forms.Button button_video;
         private System.Windows.Forms.CheckBox checkBox_DebugMode;
+        private System.Windows.Forms.RadioButton radioButton_CarB;
+        private System.Windows.Forms.RadioButton radioButton_CarA;
     }
 }
 
