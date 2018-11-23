@@ -459,32 +459,44 @@ namespace EDC20HOST
             lock (game)
             {
                 if (radioButton_CarA.Checked)
-                    game.CarA.Score += (game.CarA.People.Score() > 50 ? game.CarA.People.Score() : 50);
+                    if (game.CarA.People != null)
+                        game.CarA.Score += ((game.CarA.People.Score() > 50) ? game.CarA.People.Score() : 50);
+                    else
+                        game.CarA.Score += 50;
                 if (radioButton_CarB.Checked)
-                    game.CarB.Score += (game.CarB.People.Score() > 50 ? game.CarB.People.Score() : 50);
+                    if (game.CarB.People != null)
+                        game.CarB.Score += ((game.CarB.People.Score() > 50) ? game.CarB.People.Score() : 50);
+                    else
+                        game.CarB.Score += 50;
             }
         }
 
         private void button_plus100_Click(object sender, EventArgs e)
         {
-            lock (game)
-            {
-                if (radioButton_CarA.Checked)
-                    game.CarA.Score += (game.CarA.People.Score() > 100 ? game.CarA.People.Score() : 100);
-                if (radioButton_CarB.Checked)
-                    game.CarB.Score += (game.CarB.People.Score() > 100 ? game.CarB.People.Score() : 100);
-            }
+            if (radioButton_CarA.Checked)
+                if (game.CarA.People != null)
+                    game.CarA.Score += ((game.CarA.People.Score() > 100) ? game.CarA.People.Score() : 100);
+                else
+                    game.CarA.Score += 100;
+            if (radioButton_CarB.Checked)
+                if (game.CarB.People != null)
+                    game.CarB.Score += ((game.CarB.People.Score() > 100) ? game.CarB.People.Score() : 100);
+                else
+                    game.CarB.Score += 100;
         }
 
         private void button_plus150_Click(object sender, EventArgs e)
         {
-            lock (game)
-            {
-                if (radioButton_CarA.Checked)
-                    game.CarA.Score += (game.CarA.People.Score() > 150 ? game.CarA.People.Score() : 150);
-                if (radioButton_CarB.Checked)
-                    game.CarB.Score += (game.CarB.People.Score() > 150 ? game.CarB.People.Score() : 150);
-            }
+            if (radioButton_CarA.Checked)
+                if (game.CarA.People != null)
+                    game.CarA.Score += ((game.CarA.People.Score() > 150) ? game.CarA.People.Score() : 150);
+                else
+                    game.CarA.Score += 150;
+            if (radioButton_CarB.Checked)
+                if (game.CarB.People != null)
+                    game.CarB.Score += ((game.CarB.People.Score() > 150) ? game.CarB.People.Score() : 150);
+                else
+                    game.CarB.Score += 150;
         }
 
         private void button_reset_Click(object sender, EventArgs e)
@@ -807,12 +819,14 @@ namespace EDC20HOST
                         {
                             case Camp.CampA:
                                 Cv2.Rectangle(mat, rectDest, new Scalar(0x1b, 0xff, 0xa7), -1);
-                                Cv2.Line(mat, localiseFlags.posCarA, 
+                                if (centres1.Count != 0)
+                                    Cv2.Line(mat, centres1[0], 
                                     localiseFlags.posPassengerEnd[i], new Scalar(0x1b, 0xff, 0xa7), 2);
                                 break;
                             case Camp.CampB:
                                 Cv2.Rectangle(mat, rectDest, new Scalar(0x00, 0x98, 0xff), -1);
-                                Cv2.Line(mat, localiseFlags.posCarB,
+                                if(centres2.Count != 0)
+                                    Cv2.Line(mat, centres2[0],
                                     localiseFlags.posPassengerEnd[i], new Scalar(0x00, 0x98, 0xff), 2);
                                 break;
                             case Camp.None:
