@@ -99,7 +99,6 @@ namespace CaiNetwork
                     return i;
             }
             return -1;
-
         }
     }
 }

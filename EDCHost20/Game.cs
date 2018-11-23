@@ -10,9 +10,10 @@ namespace EDC20HOST
     public enum GameState { Unstart = 0, Normal = 1, Pause = 2, End = 3 };
     class Game
     {
+        public bool DebugMode; //调试模式，最大回合数 = 1,000,000
         public const int MaxSize = 270;
         public const int MaxPassenger = 5;
-        public const int MinCarryDistance = 8; //最小接送距离
+        public const int MinCarryDistance = 10; //最小接送距离
         public const int BackRound = 50; //回溯回合数
         public int Round { get; set; }//当前回合
         public GameState state { get; set; }
@@ -85,6 +86,7 @@ namespace EDC20HOST
             Passengers[3] = new Passenger(Generator.NextB(), false, 4);
             Passengers[4] = new Passenger(Generator.NextS(), true, 5);
             CheckPassengerNumber();
+            DebugMode = false;
         }
         protected void CheckPassengerNumber() //根据回合数更改最大乘客数量
         {
@@ -198,7 +200,7 @@ namespace EDC20HOST
                     CarB.FinishCarry();
                     NewPassenger(currNum);
                 }
-                if (Round >= 1200) //结束比赛
+                if ((Round >= 1200 && DebugMode == false) || (Round >= 1000000 && DebugMode == true)) //结束比赛
                 {
                     End();
                 }
@@ -211,42 +213,42 @@ namespace EDC20HOST
             byte[] message = new byte[64]; //上位机传递的信息
             message[0] = (byte)(((byte)state << 6)|(Round>>8));
             message[1] = (byte)Round;
-            Passenger[] P = new Passenger[5];
+            StartDestDot[] P = new StartDestDot[5];
             for (int i = 0; i != 5; ++i)
             {
-                P[i] = Passengers[i];
+                P[i] = Passengers[i].StartDestPos;
                 if(i >= CurrPassengerNumber)
                 {
-                    P[i].StartDestPos.StartPos.x = 0;
-                    P[i].StartDestPos.StartPos.y = 0;
-                    P[i].StartDestPos.DestPos.x = 0;
-                    P[i].StartDestPos.DestPos.y = 0;
+                    P[i].StartPos.x = 0;
+                    P[i].StartPos.y = 0;
+                    P[i].DestPos.x = 0;
+                    P[i].DestPos.y = 0;
                 }
             }
             message[2] = (byte)((CarA.Pos.x >> 1 & 0x80)| (CarA.Pos.y >> 2 & 0x40)| (CarB.Pos.x >> 3 & 0x20)| (CarB.Pos.y >> 4 & 0x10)
-                | (P[0].StartDestPos.StartPos.x >> 5 & 0x08) | (P[0].StartDestPos.StartPos.y >> 6 & 0x04)
-                | (P[0].StartDestPos.DestPos.x >> 7 & 0x02) | (P[0].StartDestPos.DestPos.y >> 8 & 0x01));
-            message[3] = (byte)((P[1].StartDestPos.StartPos.x >> 1 & 0x80) | (P[1].StartDestPos.StartPos.y >> 2 & 0x40)
-                | (P[1].StartDestPos.DestPos.x >> 3 & 0x20) | (P[1].StartDestPos.DestPos.y >> 4 & 0x10)
-                | (P[2].StartDestPos.StartPos.x >> 5 & 0x08) | (P[2].StartDestPos.StartPos.y >> 6 & 0x04)
-                | (P[2].StartDestPos.DestPos.x >> 7 & 0x02) | (P[2].StartDestPos.DestPos.y >> 8 & 0x01));
-            message[4] = (byte)((P[3].StartDestPos.StartPos.x >> 1 & 0x80) | (P[3].StartDestPos.StartPos.y >> 2 & 0x40)
-                | (P[3].StartDestPos.DestPos.x >> 3 & 0x20) | (P[3].StartDestPos.DestPos.y >> 4 & 0x10)
-                | (P[4].StartDestPos.StartPos.x >> 5 & 0x08) | (P[4].StartDestPos.StartPos.y >> 6 & 0x04)
-                | (P[4].StartDestPos.DestPos.x >> 7 & 0x02) | (P[4].StartDestPos.DestPos.y >> 8 & 0x01));
+                | (P[0].StartPos.x >> 5 & 0x08) | (P[0].StartPos.y >> 6 & 0x04)
+                | (P[0].DestPos.x >> 7 & 0x02) | (P[0].DestPos.y >> 8 & 0x01));
+            message[3] = (byte)((P[1].StartPos.x >> 1 & 0x80) | (P[1].StartPos.y >> 2 & 0x40)
+                | (P[1].DestPos.x >> 3 & 0x20) | (P[1].DestPos.y >> 4 & 0x10)
+                | (P[2].StartPos.x >> 5 & 0x08) | (P[2].StartPos.y >> 6 & 0x04)
+                | (P[2].DestPos.x >> 7 & 0x02) | (P[2].DestPos.y >> 8 & 0x01));
+            message[4] = (byte)((P[3].StartPos.x >> 1 & 0x80) | (P[3].StartPos.y >> 2 & 0x40)
+                | (P[3].DestPos.x >> 3 & 0x20) | (P[3].DestPos.y >> 4 & 0x10)
+                | (P[4].StartPos.x >> 5 & 0x08) | (P[4].StartPos.y >> 6 & 0x04)
+                | (P[4].DestPos.x >> 7 & 0x02) | (P[4].DestPos.y >> 8 & 0x01));
             message[5] = (byte)CarA.Pos.x;
             message[6] = (byte)CarA.Pos.y;
             message[7] = (byte)CarB.Pos.x;
             message[8] = (byte)CarB.Pos.y;
-            message[9] = (byte)((CurrPassengerNumber << 2) | (byte)P[0].Owner);
-            message[10] = (byte)((byte)P[1].Owner << 6 | (byte)P[2].Owner << 4
-                | (byte)P[3].Owner << 2 | (byte)P[4].Owner);
+            message[9] = (byte)((CurrPassengerNumber << 2) | (byte)Passengers[0].Owner);
+            message[10] = (byte)((byte)Passengers[1].Owner << 6 | (byte)Passengers[2].Owner << 4
+                | (byte)Passengers[3].Owner << 2 | (byte)Passengers[4].Owner);
             for(int i = 0; i != 5; ++i)
             {
-                message[11 + i * 4] = (byte)P[i].StartDestPos.StartPos.x;
-                message[12 + i * 4] = (byte)P[i].StartDestPos.StartPos.y;
-                message[13 + i * 4] = (byte)P[i].StartDestPos.DestPos.x;
-                message[14 + i * 4] = (byte)P[i].StartDestPos.DestPos.y;
+                message[11 + i * 4] = (byte)P[i].StartPos.x;
+                message[12 + i * 4] = (byte)P[i].StartPos.y;
+                message[13 + i * 4] = (byte)P[i].DestPos.x;
+                message[14 + i * 4] = (byte)P[i].DestPos.y;
             }
             message[31] = (byte)CarA.FoulCnt;
             message[32] = (byte)CarB.FoulCnt;

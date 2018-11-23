@@ -37,6 +37,7 @@ namespace EDC20HOST
         private VideoWriter vw = null;
 
         private CaiNetwork.CaiServer server;
+        private CaiNetwork.CaiUDP udp;
 
         public Dot CarALocation()
         {
@@ -58,7 +59,9 @@ namespace EDC20HOST
             InitializeComponent();
 
             InitialCaiServer();
-            MessageBox.Show("IP is "+ server.getUsedIP().ToString()+"  port is "+ server.getPort().ToString());
+            MessageBox.Show("TCP IP is "+ server.getUsedIP().ToString()+"  port is "+ server.getPort().ToString());
+            udp = new CaiNetwork.CaiUDP();
+            MessageBox.Show("UDP IP is " + udp.broadcastIpEndPoint.Address.ToString() + "  port is " + udp.broadcastIpEndPoint.Port.ToString());
 
             tbsPoint = new TextBox[] { tbPoint1, tbPoint2, tbPoint3, tbPoint4 };
             // Init
@@ -70,7 +73,7 @@ namespace EDC20HOST
             localiser = new Localiser();
             capture = new VideoCapture();
            // threadCamera = new Thread(CameraReading);
-            capture.Open(1);
+            capture.Open(0);
             timeCamNow = DateTime.Now;
             timeCamPrev = timeCamNow;
 
@@ -91,7 +94,7 @@ namespace EDC20HOST
                 capture.ConvertRgb = true;
                 timer100ms.Interval = 75;
                 timer100ms.Start();
-                Cv2.NamedWindow("binary");
+                //Cv2.NamedWindow("binary");
             }
 
         }
@@ -204,6 +207,7 @@ namespace EDC20HOST
         private void CaiZhuo_SendBytesViaNet(byte[] Message)
         {
             server.GroupSend(Message);
+            udp.sendByte(Message);
         }
 
         private void Tracker_FormClosed(object sender, FormClosedEventArgs e)
@@ -494,12 +498,12 @@ namespace EDC20HOST
 
         private void button_video_Click(object sender, EventArgs e)
         {
-            lock(flags)
+            lock (flags)
             {
-                if(flags.videomode == false)
+                if (flags.videomode == false)
                 {
-                    vw = new VideoWriter("../../video/"+ DateTime.Now.ToString("MMdd_HH_mm_ss") + ".mp4",
-                        FourCC.MJPG, 10.0, flags.showSize);
+                    vw = new VideoWriter("../../video/" + DateTime.Now.ToString("MMdd_HH_mm_ss") + ".avi",
+                        FourCC.XVID, 10.0, flags.showSize);
                     flags.videomode = true;
                     ((Button)sender).Text = "停止录像";
                 }
@@ -511,6 +515,10 @@ namespace EDC20HOST
                     ((Button)sender).Text = "开始录像";
                 }
             }
+        }
+        private void checkBox_DebugMode_CheckedChanged(object sender, EventArgs e)
+        {
+            game.DebugMode = checkBox_DebugMode.Checked;
         }
     }
 
@@ -739,7 +747,7 @@ namespace EDC20HOST
             using (Mat hsv = new Mat())
             using (Mat car1 = new Mat())
             using (Mat car2 = new Mat())
-            using (Mat merged = new Mat())
+            //using (Mat merged = new Mat())
             using (Mat black = new Mat(mat.Size(), MatType.CV_8UC1))
             {
                 Cv2.CvtColor(mat, hsv, ColorConversionCodes.RGB2HSV);
@@ -820,8 +828,8 @@ namespace EDC20HOST
                     }
                 }
 
-                Cv2.Merge(new Mat[] { car1, car2, black }, merged);
-                Cv2.ImShow("binary", merged);
+                //Cv2.Merge(new Mat[] { car1, car2, black }, merged);
+                //Cv2.ImShow("binary", merged);
             }
         }
     }
