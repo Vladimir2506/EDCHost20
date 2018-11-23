@@ -34,6 +34,7 @@ namespace EDC20HOST
         private Point2i car1;
         private Point2i car2;
         private Game game;
+        private VideoWriter vw = null;
 
         private CaiNetwork.CaiServer server;
 
@@ -168,6 +169,9 @@ namespace EDC20HOST
                         Cv2.Resize(videoFrame, showFrame, flags.showSize, 0, 0, InterpolationFlags.Nearest);
                         BeginInvoke(new Action<TimeSpan>(UpdateProcessTime), timeProcess);
                         BeginInvoke(new Action<Image>(UpdateCameraPicture), BitmapConverter.ToBitmap(showFrame));
+                        //输出视频
+                        if (flags.videomode == true)
+                            vw.Write(showFrame);
                     }
                     lock (flags)
                     {
@@ -411,16 +415,6 @@ namespace EDC20HOST
             timer100ms.Interval = (int)numericUpDownTime.Value;
         }
 
-        private void radioButton_CarA_CheckedChanged(object sender, EventArgs e)
-        {
-            radioButton_CarB.Checked = false;
-        }
-
-        private void radioButton_CarB_CheckedChanged(object sender, EventArgs e)
-        {
-            radioButton_CarA.Checked = false;
-        }
-
         private void button_minus10_Click(object sender, EventArgs e)
         {
             lock (game)
@@ -461,9 +455,9 @@ namespace EDC20HOST
             lock (game)
             {
                 if (radioButton_CarA.Checked)
-                    game.CarA.Score += 50;
+                    game.CarA.Score += (game.CarA.People.Score() > 50 ? game.CarA.People.Score() : 50);
                 if (radioButton_CarB.Checked)
-                    game.CarB.Score += 50;
+                    game.CarB.Score += (game.CarB.People.Score() > 50 ? game.CarB.People.Score() : 50);
             }
         }
 
@@ -472,9 +466,9 @@ namespace EDC20HOST
             lock (game)
             {
                 if (radioButton_CarA.Checked)
-                    game.CarA.Score += 100;
+                    game.CarA.Score += (game.CarA.People.Score() > 100 ? game.CarA.People.Score() : 100);
                 if (radioButton_CarB.Checked)
-                    game.CarB.Score += 100;
+                    game.CarB.Score += (game.CarB.People.Score() > 100 ? game.CarB.People.Score() : 100);
             }
         }
 
@@ -483,9 +477,9 @@ namespace EDC20HOST
             lock (game)
             {
                 if (radioButton_CarA.Checked)
-                    game.CarA.Score += 150;
+                    game.CarA.Score += (game.CarA.People.Score() > 150 ? game.CarA.People.Score() : 150);
                 if (radioButton_CarB.Checked)
-                    game.CarB.Score += 150;
+                    game.CarB.Score += (game.CarB.People.Score() > 150 ? game.CarB.People.Score() : 150);
             }
         }
 
@@ -497,12 +491,34 @@ namespace EDC20HOST
             buttonStart.Enabled = true;
             button_reset.Enabled = false;
         }
+
+        private void button_video_Click(object sender, EventArgs e)
+        {
+            lock(flags)
+            {
+                if(flags.videomode == false)
+                {
+                    vw = new VideoWriter("../../video/"+ DateTime.Now.ToString("MMdd_HH_mm_ss") + ".mp4",
+                        FourCC.MJPG, 10.0, flags.showSize);
+                    flags.videomode = true;
+                    ((Button)sender).Text = "停止录像";
+                }
+                else
+                {
+                    vw.Release();
+                    vw = null;
+                    flags.videomode = false;
+                    ((Button)sender).Text = "开始录像";
+                }
+            }
+        }
     }
 
     public class MyFlags
     {
         public bool running;
         public bool calibrated;
+        public bool videomode;
         public int clickCount;
         public struct LocConfigs
         {
@@ -532,6 +548,7 @@ namespace EDC20HOST
         {
             running = false;
             calibrated = false;
+            videomode = false;
             configs = new LocConfigs();
             posCarA = new Point2i();
             posCarB = new Point2i();
@@ -782,14 +799,20 @@ namespace EDC20HOST
                         {
                             case Camp.CampA:
                                 Cv2.Rectangle(mat, rectDest, new Scalar(0x1b, 0xff, 0xa7), -1);
+                                Cv2.Line(mat, localiseFlags.posCarA, 
+                                    localiseFlags.posPassengerEnd[i], new Scalar(0x1b, 0xff, 0xa7), 2);
                                 break;
                             case Camp.CampB:
                                 Cv2.Rectangle(mat, rectDest, new Scalar(0x00, 0x98, 0xff), -1);
+                                Cv2.Line(mat, localiseFlags.posCarB,
+                                    localiseFlags.posPassengerEnd[i], new Scalar(0x00, 0x98, 0xff), 2);
                                 break;
                             case Camp.None:
                                 // Cv2.Circle(mat, localiseFlags.posPassengerStart[i], 5, new Scalar(0xd8, 0x93, 0xce), -1);
-                                if (i != 4) Cv2.Rectangle(mat, rectSrc, new Scalar(0xf3, 0x96, 0x21), -1);
-                                else Cv2.Rectangle(mat, rectSrc, new Scalar(0x58, 0xee, 0xff), -1);
+                                Cv2.Rectangle(mat, rectSrc, new Scalar(0xf3, 0x96, 0x21), -1);
+                                Cv2.Rectangle(mat, rectDest, new Scalar(0x58, 0xee, 0xff), -1);
+                                Cv2.Line(mat, localiseFlags.posPassengerStart[i],
+                                    localiseFlags.posPassengerEnd[i], new Scalar(0xf3, 0x96, 0x21), 2);
                                 break;
                             default:
                                 break;

@@ -46,7 +46,7 @@ namespace EDC20HOST
                 }
                 else continue;
             if (score == 0) throw new System.IndexOutOfRangeException("Score为0");
-            if (Special) score = score * 3 / 2;
+            // if (Special) score = score * 3 / 2;
             return score;
         }
         public Passenger(StartDestDot startDestDot, bool special, int number)
