@@ -15,10 +15,11 @@ namespace EDC20HOST
         public Passenger People { get; set; } //乘客
         public bool UnderStop; //是否正在强制停车
         public int FoulCnt; //惩罚次数
-        public void FinishCarry()
+        public void FinishCarry(bool getScore = true)
         {
             if (People == null) return; //没有乘客直接返回
-            Score += People.Score();
+            if(getScore)
+                Score += People.Score();
             People = null;
         }
         public void Stop() { UnderStop = true; } //车辆强制停止

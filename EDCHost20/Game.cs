@@ -52,11 +52,11 @@ namespace EDC20HOST
             MapFile.Position = 54;
             MapFile.Read(buffer, 0, buffer.Length);
             for (int i = 0; i != MaxSize; ++i)
-               for (int j = 0; j != MaxSize; ++j)
-                 if (buffer[(i * MaxSize + j) * 3 + 2*i] > 128)//白色
-                   GameMap[i, j] = true;
-              else
-                   GameMap[i, j] = false;
+                for (int j = 0; j != MaxSize; ++j)
+                    if (buffer[(i * MaxSize + j) * 3 + 2 * i] > 128)//白色
+                        GameMap[i, j] = true;
+                    else
+                        GameMap[i, j] = false;
         }
         public static StartDestDot OppoDots(StartDestDot prevDot)
         {
@@ -114,34 +114,28 @@ namespace EDC20HOST
                 temp = Generator.NextS();
             Passengers[num - 1] = new Passenger(temp, num == 5, num);
         }
-        /*public void CarFoul(Camp c) //车犯规
+
+        //增加分数
+        public void addScore(Camp c, int score)
         {
-            Pause();
-            if (c == Camp.CampA)
+            switch (c)
             {
-                CarB.Score += Car.PunishScore;
-                CarA.FoulCnt++;
+                case Camp.CampA:
+                    if (score > 0 && CarA.People != null)
+                        score = (score > CarA.People.Score() ? score : CarA.People.Score());
+                    CarA.Score += score;
+                    if (CarA.Score < 0) CarA.Score = 0;
+                    return;
+                case Camp.CampB:
+                    if (score > 0 && CarB.People != null)
+                        score = (score > CarB.People.Score() ? score : CarB.People.Score());
+                    CarB.Score += score;
+                    if (CarB.Score < 0) CarB.Score = 0;
+                    return;
+                default: return;
             }
-            else
-            {
-                CarA.Score += Car.PunishScore;
-                CarB.FoulCnt++;
-            }
-            Round -= BackRound;
-            if(CarA.People != null)
-            {
-                int currNum = CarA.People.Number;
-                CarA.People = null;
-                NewPassenger(currNum);
-            }
-            if (CarB.People != null)
-            {
-                int currNum = CarB.People.Number;
-                CarB.People = null;
-                NewPassenger(currNum);
-            }
-            if (Round < 0) Round = 0;
-        }*/
+        }
+
         public void Start() //开始比赛
         {
             state = GameState.Normal;
@@ -157,6 +151,35 @@ namespace EDC20HOST
         public void End() //结束比赛
         {
             state = GameState.End;
+        }
+        //复位
+        public void AskPause(Camp c)
+        {
+            Pause();
+            Round -= 50;
+            if (Round < 0) Round = 0;
+            bool Aget = false, Bget = false;
+            switch (c)
+            {
+                case Camp.CampA:
+                    Bget = true;
+                    break;
+                case Camp.CampB:
+                    Aget = true;
+                    break;
+            }
+            if(CarA.People!=null)
+            {
+                int currNum = CarA.People.Number;
+                CarA.FinishCarry(Aget);
+                NewPassenger(currNum);
+            }
+            if (CarB.People != null)
+            {
+                int currNum = CarB.People.Number;
+                CarB.FinishCarry(Bget);
+                NewPassenger(currNum);
+            }
         }
         public void Update()//每回合执行
         {
