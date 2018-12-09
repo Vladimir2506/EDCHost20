@@ -82,7 +82,8 @@ namespace EDC20HOST
 
             buttonStart.Enabled = true;
             buttonPause.Enabled = false;
-            button_reset.Enabled = false;
+            button_AReset.Enabled = false;
+            button_BReset.Enabled = false;
 
             Game.LoadMap();
             game = new Game();
@@ -317,7 +318,8 @@ namespace EDC20HOST
             game.Start();
             buttonPause.Enabled = true;
             buttonStart.Enabled = false;
-            button_reset.Enabled = true;
+            button_AReset.Enabled = true;
+            button_BReset.Enabled = true;
         }
 
         private void buttonPause_Click(object sender, EventArgs e)
@@ -325,7 +327,8 @@ namespace EDC20HOST
             game.Pause();
             buttonPause.Enabled = false;
             buttonStart.Enabled = true;
-            button_reset.Enabled = false;
+            button_AReset.Enabled = false;
+            button_BReset.Enabled = false;
         }
 
         private void ShowMessage(byte[] M) //通过Message显示信息到UI上
@@ -398,7 +401,9 @@ namespace EDC20HOST
             lock (game) { game = new Game(); }
             buttonStart.Enabled = true;
             buttonPause.Enabled = false;
-            button_reset.Enabled = false;
+            button_AReset.Enabled = false;
+            button_BReset.Enabled = false;
+            game.DebugMode = checkBox_DebugMode.Checked;
         }
 
         private void buttonChangeScore_Click(object sender, EventArgs e)
@@ -421,82 +426,50 @@ namespace EDC20HOST
 
         private void button_minus10_Click(object sender, EventArgs e)
         {
-            lock (game)
-            {
-                if (radioButton_CarA.Checked)
-                {
-                    game.CarA.Score -= 10;
-                }
-                if (radioButton_CarB.Checked)
-                    game.CarB.Score -= 10;
-            }  
+            if (radioButton_CarA.Checked)
+                game.addScore(Camp.CampA, -10);
+            if (radioButton_CarB.Checked)
+                game.addScore(Camp.CampB, -10);
         }
 
         private void button_minus20_Click(object sender, EventArgs e)
         {
-            lock (game)
-            {
-                if (radioButton_CarA.Checked)
-                    game.CarA.Score -= 20;
-                if (radioButton_CarB.Checked)
-                    game.CarB.Score -= 20;
-            }
+            if (radioButton_CarA.Checked)
+                game.addScore(Camp.CampA, -20);
+            if (radioButton_CarB.Checked)
+                game.addScore(Camp.CampB, -20);
         }
 
         private void button_minus80_Click(object sender, EventArgs e)
         {
-            lock (game)
-            {
-                if (radioButton_CarA.Checked)
-                    game.CarA.Score -= 80;
-                if (radioButton_CarB.Checked)
-                    game.CarB.Score -= 80;
-            }
+            if (radioButton_CarA.Checked)
+                game.addScore(Camp.CampA, -80);
+            if (radioButton_CarB.Checked)
+                game.addScore(Camp.CampB, -80);
         }
 
         private void button_plus50_Click(object sender, EventArgs e)
         {
-            lock (game)
-            {
-                if (radioButton_CarA.Checked)
-                    if (game.CarA.People != null)
-                        game.CarA.Score += ((game.CarA.People.Score() > 50) ? game.CarA.People.Score() : 50);
-                    else
-                        game.CarA.Score += 50;
-                if (radioButton_CarB.Checked)
-                    if (game.CarB.People != null)
-                        game.CarB.Score += ((game.CarB.People.Score() > 50) ? game.CarB.People.Score() : 50);
-                    else
-                        game.CarB.Score += 50;
-            }
+            if (radioButton_CarA.Checked)
+                game.addScore(Camp.CampA, 50);
+            if (radioButton_CarB.Checked)
+                game.addScore(Camp.CampB, 50);
         }
 
         private void button_plus100_Click(object sender, EventArgs e)
         {
             if (radioButton_CarA.Checked)
-                if (game.CarA.People != null)
-                    game.CarA.Score += ((game.CarA.People.Score() > 100) ? game.CarA.People.Score() : 100);
-                else
-                    game.CarA.Score += 100;
+                game.addScore(Camp.CampA, 100);
             if (radioButton_CarB.Checked)
-                if (game.CarB.People != null)
-                    game.CarB.Score += ((game.CarB.People.Score() > 100) ? game.CarB.People.Score() : 100);
-                else
-                    game.CarB.Score += 100;
+                game.addScore(Camp.CampB, 100);
         }
 
         private void button_plus150_Click(object sender, EventArgs e)
         {
             if (radioButton_CarA.Checked)
-                if (game.CarA.People != null)
-                    game.CarA.Score += ((game.CarA.People.Score() > 150) ? game.CarA.People.Score() : 150);
-                else
-                    game.CarA.Score += 150;
+                game.addScore(Camp.CampA, 150);
             if (radioButton_CarB.Checked)
-                if (game.CarB.People != null)
-                    game.CarB.Score += ((game.CarB.People.Score() > 150) ? game.CarB.People.Score() : 150);
-                else
-                    game.CarB.Score += 150;
+                game.addScore(Camp.CampB, 150);
         }
 
         private void button_reset_Click(object sender, EventArgs e)
@@ -505,7 +478,8 @@ namespace EDC20HOST
             game.Round -= 50; //复位5s
             buttonPause.Enabled = false;
             buttonStart.Enabled = true;
-            button_reset.Enabled = false;
+            button_AReset.Enabled = false;
+            button_BReset.Enabled = false;
         }
 
         private void button_video_Click(object sender, EventArgs e)
@@ -531,6 +505,16 @@ namespace EDC20HOST
         private void checkBox_DebugMode_CheckedChanged(object sender, EventArgs e)
         {
             game.DebugMode = checkBox_DebugMode.Checked;
+        }
+
+        private void button_AReset_Click(object sender, EventArgs e)
+        {
+            game.AskPause(Camp.CampA);
+        }
+
+        private void button_BReset_Click(object sender, EventArgs e)
+        {
+            game.AskPause(Camp.CampB);
         }
     }
 
