@@ -12,7 +12,7 @@ namespace EDC20HOST
         public int x;
         public int y;
     }
-    struct StartDestDot
+    public struct StartDestDot
     {
         public Dot StartPos;
         public Dot DestPos;
@@ -24,7 +24,7 @@ namespace EDC20HOST
     {
         None = 0, CampA, CampB
     }
-    class Passenger
+    public class Passenger
     {
         private static int[] distanceLevel = new int[5] { 0, 68, 158, 270, 381 };
         private static int[] scoreLevel = new int[4] { 20, 40, 80, 100 };
@@ -64,7 +64,7 @@ namespace EDC20HOST
             Owner = Camp.None;
         }
     }
-    class PassengerGenerator //存储预备要用的乘客信息
+    public class PassengerGenerator //存储预备要用的乘客信息
     {
         //A和B分别完成到了哪一个乘客
         private Stack<StartDestDot> APassenger;

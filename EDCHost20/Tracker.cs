@@ -28,7 +28,6 @@ namespace EDC20HOST
         private Point2f[] ptsShowCorners = null;
         private DateTime timeCamNow;
         private DateTime timeCamPrev;
-        private TextBox[] tbsPoint = null;
         private CoordinateConverter cc;
         private Localiser localiser;
         private Point2i car1;
@@ -38,6 +37,10 @@ namespace EDC20HOST
 
         private CaiNetwork.CaiServer server;
         private CaiNetwork.CaiUDP udp;
+
+        private string[] gametext = { "上半场", "下半场", "加时1", "加时2",
+            "加时3", "加时4", "加时5", "加时6", "加时7" };
+        private Camp[] UI_LastRoundCamp = new Camp[5];
 
         public Dot CarALocation()
         {
@@ -57,13 +60,32 @@ namespace EDC20HOST
         public Tracker()
         {
             InitializeComponent();
+            //UI
+            
+            label_RedBG.SendToBack();
+            label_BlueBG.SendToBack();
+            label_RedBG.Controls.Add(label_CarA);
+            label_RedBG.Controls.Add(labelAScore);
+            label_BlueBG.Controls.Add(label_CarB);
+            int newX = label_CarB.Location.X - label_BlueBG.Location.X;
+            int newY = label_CarB.Location.Y - label_BlueBG.Location.Y;
+            label_CarB.Location = new System.Drawing.Point(newX, newY);
+            label_BlueBG.Controls.Add(labelBScore);
+            newX = labelBScore.Location.X - label_BlueBG.Location.X;
+            newY = labelBScore.Location.Y - label_BlueBG.Location.Y;
+            labelBScore.Location = new System.Drawing.Point(newX, newY);
+            label_BlueBG.Controls.Add(label_CountDown);
+            newX = label_CountDown.Location.X - label_BlueBG.Location.X;
+            newY = label_CountDown.Location.Y - label_BlueBG.Location.Y;
+            label_CountDown.Location = new System.Drawing.Point(newX, newY);
+            label_RedBG.Controls.Add(label_GameCount);
+            label_GameCount.Text = "上半场";
 
             InitialCaiServer();
             MessageBox.Show("TCP IP is "+ server.getUsedIP().ToString()+"  port is "+ server.getPort().ToString());
             udp = new CaiNetwork.CaiUDP();
             MessageBox.Show("UDP IP is " + udp.broadcastIpEndPoint.Address.ToString() + "  port is " + udp.broadcastIpEndPoint.Port.ToString());
 
-            tbsPoint = new TextBox[] { tbPoint1, tbPoint2, tbPoint3, tbPoint4 };
             // Init
             flags = new MyFlags();
             flags.Init();
@@ -93,7 +115,7 @@ namespace EDC20HOST
                 capture.FrameWidth = flags.cameraSize.Width;
                 capture.FrameHeight = flags.cameraSize.Height;
                 capture.ConvertRgb = true;
-                timer100ms.Interval = 75;
+                timer100ms.Interval = 90;
                 timer100ms.Start();
                 //Cv2.NamedWindow("binary");
             }
@@ -127,7 +149,7 @@ namespace EDC20HOST
             byte[] Message = game.PackMessage();
             string a = BitConverter.ToString(Message, 0);
             // labelMsg.Text = a;
-            labelRound.Text = Convert.ToString(game.Round);
+            label_CountDown.Text = Convert.ToString(game.Round);
             CaiZhuo_SendBytesViaNet(Message);
             ShowMessage(Message);
         }
@@ -135,11 +157,11 @@ namespace EDC20HOST
         private void CameraReading()
         {
             bool control = false;
-            lock(flags)
+            lock (flags)
             {
                 control = flags.running;
             }
-            if(control)
+            if (control)
             {
                 using (Mat videoFrame = new Mat())
                 using (Mat showFrame = new Mat())
@@ -171,7 +193,6 @@ namespace EDC20HOST
                         TimeSpan timeProcess = timeCamNow - timeCamPrev;
                         timeCamPrev = timeCamNow;
                         Cv2.Resize(videoFrame, showFrame, flags.showSize, 0, 0, InterpolationFlags.Nearest);
-                        BeginInvoke(new Action<TimeSpan>(UpdateProcessTime), timeProcess);
                         BeginInvoke(new Action<Image>(UpdateCameraPicture), BitmapConverter.ToBitmap(showFrame));
                         //输出视频
                         if (flags.videomode == true)
@@ -183,12 +204,6 @@ namespace EDC20HOST
                     }
                 }
             }
-        }
-
-        private void UpdateProcessTime(TimeSpan time)
-        {
-            string timeToDisp = time.TotalMilliseconds.ToString();
-            tbInfo.Text = timeToDisp + "ms";
         }
 
         private void UpdateCameraPicture(Image img)
@@ -221,11 +236,6 @@ namespace EDC20HOST
             timer100ms.Stop();
             //threadCamera.Join();
             capture.Release();
-
-            string arrStr = String.Format("{0} {1} {2} {3} {4} {5} {6} {7}", flags.configs.hue1Lower, flags.configs.hue1Upper, flags.configs.hue2Lower
-            , flags.configs.hue2Upper, flags.configs.saturation1Lower, flags.configs.saturation2Lower
-            , flags.configs.valueLower, flags.configs.areaLower);
-            File.WriteAllText("data.txt", arrStr);
         }
 
         private void btnReset_Click(object sender, EventArgs e)
@@ -234,11 +244,6 @@ namespace EDC20HOST
             {
                 flags.clickCount = 0;
                 flags.calibrated = false;
-            }
-
-            foreach(TextBox tb in tbsPoint)
-            {
-                tb.Text = "";
             }
         }
 
@@ -262,50 +267,8 @@ namespace EDC20HOST
             {
                 ptsShowCorners[idx].X = xMouse;
                 ptsShowCorners[idx].Y = yMouse;
-
-                tbsPoint[idx].Text = String.Format("({0},{1})", xMouse, yMouse);
                 if (idx == 3) cc.UpdateCorners(ptsShowCorners, flags);
             }
-        }
-
-        private void nudHue1L_ValueChanged(object sender, EventArgs e)
-        {
-            lock (flags) flags.configs.hue1Lower = (int)nudHue1L.Value;
-        }
-
-        private void nudHue1H_ValueChanged(object sender, EventArgs e)
-        {
-            lock (flags) flags.configs.hue1Upper = (int)nudHue1H.Value;
-        }
-
-        private void nudHue2L_ValueChanged(object sender, EventArgs e)
-        {
-            lock (flags) flags.configs.hue2Lower = (int)nudHue2L.Value;
-        }
-
-        private void nudHue2H_ValueChanged(object sender, EventArgs e)
-        {
-            lock (flags) flags.configs.hue2Upper = (int)nudHue2H.Value;
-        }
-
-        private void nudSat1L_ValueChanged(object sender, EventArgs e)
-        {
-            lock (flags) flags.configs.saturation1Lower = (int)nudSat1L.Value;
-        }
-
-        private void nudSat2L_ValueChanged(object sender, EventArgs e)
-        {
-            lock (flags) flags.configs.saturation2Lower = (int)nudSat2L.Value;
-        }
-
-        private void nudValueL_ValueChanged(object sender, EventArgs e)
-        {
-            lock (flags) flags.configs.valueLower = (int)nudValueL.Value;
-        }
-
-        private void nudAreaL_ValueChanged(object sender, EventArgs e)
-        {
-            lock (flags) flags.configs.areaLower = (int)nudAreaL.Value;
         }
 
         private void timer100ms_Tick(object sender, EventArgs e)
@@ -325,6 +288,20 @@ namespace EDC20HOST
         private void buttonPause_Click(object sender, EventArgs e)
         {
             game.Pause();
+            if(game.CarA.People!=null)
+            {
+                game.CarA.Score += game.CarA.People.Score() / 2;
+                int currNum = game.CarA.People.Number;
+                game.CarA.FinishCarry(false);
+                game.NewPassenger(currNum);
+            }
+            if (game.CarB.People != null)
+            {
+                game.CarB.Score += game.CarB.People.Score() / 2;
+                int currNum = game.CarB.People.Number;
+                game.CarB.FinishCarry(false);
+                game.NewPassenger(currNum);
+            }
             buttonPause.Enabled = false;
             buttonStart.Enabled = true;
             button_AReset.Enabled = false;
@@ -333,67 +310,19 @@ namespace EDC20HOST
 
         private void ShowMessage(byte[] M) //通过Message显示信息到UI上
         {
-            int x, y;
-            x = ((M[2] & 0x80) << 1) + M[5];
-            y = ((M[2] & 0x40) << 2) + M[6];
-            labelALocation.Text = $"({x}, {y})";
-            x = ((M[2] & 0x20) << 3) + M[7];
-            y = ((M[2] & 0x10) << 4) + M[8];
-            labelBLocation.Text = $"({x}, {y})";
-            int tx, ty;
-            x = ((M[2] & 0x08) << 5) + M[11];
-            y = ((M[2] & 0x04) << 6) + M[12];
-            tx = ((M[2] & 0x02) << 7) + M[13];
-            ty = ((M[2] & 0x01) << 8) + M[14];
-            label1L.Text = $"({x}, {y}) -> ({tx}, {ty})/{M[9] & 0x03}";
-            x = ((M[3] & 0x80) << 1) + M[15];
-            y = ((M[3] & 0x40) << 2) + M[16];
-            tx = ((M[3] & 0x20) << 3) + M[17];
-            ty = ((M[3] & 0x10) << 4) + M[18];
-            label2L.Text = $"({x}, {y}) -> ({tx}, {ty})/{(M[10] & 0xC0) >> 6}";
-            x = ((M[3] & 0x08) << 5) + M[19];
-            y = ((M[3] & 0x04) << 6) + M[20];
-            tx = ((M[3] & 0x02) << 7) + M[21];
-            ty = ((M[3] & 0x01) << 8) + M[22];
-            label3L.Text = $"({x}, {y}) -> ({tx}, {ty})/{(M[10] & 0x30) >> 4}";
-            x = ((M[4] & 0x80) << 1) + M[23];
-            y = ((M[4] & 0x40) << 2) + M[24];
-            tx = ((M[4] & 0x20) << 3) + M[25];
-            ty = ((M[4] & 0x10) << 4) + M[26];
-            label4L.Text = $"({x}, {y}) -> ({tx}, {ty})/{(M[10] & 0x0C) >> 2}";
-            x = ((M[4] & 0x08) << 5) + M[27];
-            y = ((M[4] & 0x04) << 6) + M[28];
-            tx = ((M[4] & 0x02) << 7) + M[29];
-            ty = ((M[4] & 0x01) << 8) + M[30];
-            label5L.Text = $"({x}, {y}) -> ({tx}, {ty})/{(M[10] & 0x03)}";
-            labelValidP.Text = $"{M[9] >> 2}";
-            labelRound.Text = $"{((M[0] & 0x3F) << 8) + M[1]}";
-            labelState.Text = $"{((M[0] & 0xC0) >> 6)}";
-            labelAScore.Text = $"{(M[33] << 8) + M[34]}/{M[31]}";
-            labelBScore.Text = $"{(M[35] << 8) + M[36]}/{M[32]}";
-        }
+            label_CountDown.Text = $"{(game.MaxRound-game.Round)/600}:{((game.MaxRound - game.Round) / 10)%60/10}{((game.MaxRound - game.Round) / 10) % 60 % 10}";
 
-        private void Tracker_Load(object sender, EventArgs e)
-        {
-            if (File.Exists("data.txt"))
-            {
-                FileStream fsRead = new FileStream("data.txt", FileMode.Open);
-                int fsLen = (int)fsRead.Length;
-                byte[] heByte = new byte[fsLen];
-                int r = fsRead.Read(heByte, 0, heByte.Length);
-                string myStr = System.Text.Encoding.UTF8.GetString(heByte);
-                string[] str = myStr.Split(' ');
-                nudHue1L.Value = (flags.configs.hue1Lower = Convert.ToInt32(str[0]));
-                nudHue1H.Value = (flags.configs.hue1Upper = Convert.ToInt32(str[1]));
-                nudHue2L.Value = (flags.configs.hue2Lower = Convert.ToInt32(str[2]));
-                nudHue2H.Value = (flags.configs.hue2Upper = Convert.ToInt32(str[3]));
-                nudSat1L.Value = (flags.configs.saturation1Lower = Convert.ToInt32(str[4]));
-                nudSat2L.Value = (flags.configs.saturation2Lower = Convert.ToInt32(str[5]));
-                nudValueL.Value = (flags.configs.valueLower = Convert.ToInt32(str[6]));
-                nudAreaL.Value = (flags.configs.areaLower = Convert.ToInt32(str[7]));
-                fsRead.Close();
-            }
+            labelAScore.Text = $"{game.CarA.Score}";
+            labelBScore.Text = $"{game.CarB.Score}";
 
+            label_GameCount.Text = gametext[game.GameCount - 1];
+            label_APauseNum.Text = $"{game.APauseNum}";
+            label_BPauseNum.Text = $"{game.BPauseNum}";
+            label_AFoul1Num.Text = $"{game.AFoul1}";
+            label_BFoul1Num.Text = $"{game.BFoul1}";
+            label_AFoul2Num.Text = $"{game.AFoul2}";
+            label_BFoul2Num.Text = $"{game.BFoul2}";
+            //  groupBox_Passenger.Refresh();
         }
 
         private void button_restart_Click(object sender, EventArgs e)
@@ -403,7 +332,6 @@ namespace EDC20HOST
             buttonPause.Enabled = false;
             button_AReset.Enabled = false;
             button_BReset.Enabled = false;
-            game.DebugMode = checkBox_DebugMode.Checked;
         }
 
         private void buttonChangeScore_Click(object sender, EventArgs e)
@@ -419,68 +347,7 @@ namespace EDC20HOST
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            timer100ms.Interval = (int)numericUpDownTime.Value;
-        }
 
-        private void button_minus10_Click(object sender, EventArgs e)
-        {
-            if (radioButton_CarA.Checked)
-                game.addScore(Camp.CampA, -10);
-            if (radioButton_CarB.Checked)
-                game.addScore(Camp.CampB, -10);
-        }
-
-        private void button_minus20_Click(object sender, EventArgs e)
-        {
-            if (radioButton_CarA.Checked)
-                game.addScore(Camp.CampA, -20);
-            if (radioButton_CarB.Checked)
-                game.addScore(Camp.CampB, -20);
-        }
-
-        private void button_minus80_Click(object sender, EventArgs e)
-        {
-            if (radioButton_CarA.Checked)
-                game.addScore(Camp.CampA, -80);
-            if (radioButton_CarB.Checked)
-                game.addScore(Camp.CampB, -80);
-        }
-
-        private void button_plus50_Click(object sender, EventArgs e)
-        {
-            if (radioButton_CarA.Checked)
-                game.addScore(Camp.CampA, 50);
-            if (radioButton_CarB.Checked)
-                game.addScore(Camp.CampB, 50);
-        }
-
-        private void button_plus100_Click(object sender, EventArgs e)
-        {
-            if (radioButton_CarA.Checked)
-                game.addScore(Camp.CampA, 100);
-            if (radioButton_CarB.Checked)
-                game.addScore(Camp.CampB, 100);
-        }
-
-        private void button_plus150_Click(object sender, EventArgs e)
-        {
-            if (radioButton_CarA.Checked)
-                game.addScore(Camp.CampA, 150);
-            if (radioButton_CarB.Checked)
-                game.addScore(Camp.CampB, 150);
-        }
-
-        private void button_reset_Click(object sender, EventArgs e)
-        {
-            game.Pause();
-            game.Round -= 50; //复位5s
-            buttonPause.Enabled = false;
-            buttonStart.Enabled = true;
-            button_AReset.Enabled = false;
-            button_BReset.Enabled = false;
-        }
 
         private void button_video_Click(object sender, EventArgs e)
         {
@@ -502,19 +369,142 @@ namespace EDC20HOST
                 }
             }
         }
-        private void checkBox_DebugMode_CheckedChanged(object sender, EventArgs e)
-        {
-            game.DebugMode = checkBox_DebugMode.Checked;
-        }
 
         private void button_AReset_Click(object sender, EventArgs e)
         {
-            game.AskPause(Camp.CampA);
+            if (game.APauseNum < 3)
+            {
+                game.AskPause(Camp.CampA);
+                buttonPause.Enabled = false;
+                buttonStart.Enabled = true;
+                button_AReset.Enabled = false;
+                button_BReset.Enabled = false;
+            }
         }
 
         private void button_BReset_Click(object sender, EventArgs e)
         {
-            game.AskPause(Camp.CampB);
+            if (game.BPauseNum < 3)
+            {
+                game.AskPause(Camp.CampB);
+                buttonPause.Enabled = false;
+                buttonStart.Enabled = true;
+                button_AReset.Enabled = false;
+                button_BReset.Enabled = false;
+            }
+        }
+
+        private void button_set_Click(object sender, EventArgs e)
+        {
+            lock (flags)
+            {
+                SetWindow st = new SetWindow(ref flags, ref game);
+                st.Show();
+            }
+        }
+
+        private void numericUpDownScoreA_ValueChanged(object sender, EventArgs e)
+        {
+            game.addScore(Camp.CampA, (int)((NumericUpDown)sender).Value);
+            ((NumericUpDown)sender).Value = 0;
+        }
+
+        private void numericUpDownScoreB_ValueChanged(object sender, EventArgs e)
+        {
+            game.addScore(Camp.CampB, (int)((NumericUpDown)sender).Value);
+            ((NumericUpDown)sender).Value = 0;
+        }
+
+        private void Tracker_Load(object sender, EventArgs e)
+        {
+            if (File.Exists("data.txt"))
+            {
+                FileStream fsRead = new FileStream("data.txt", FileMode.Open);
+                int fsLen = (int)fsRead.Length;
+                byte[] heByte = new byte[fsLen];
+                int r = fsRead.Read(heByte, 0, heByte.Length);
+                string myStr = System.Text.Encoding.UTF8.GetString(heByte);
+                string[] str = myStr.Split(' ');
+                flags.configs.hue1Lower = Convert.ToInt32(str[0]);
+                flags.configs.hue1Upper = Convert.ToInt32(str[1]);
+                flags.configs.hue2Lower = Convert.ToInt32(str[2]);
+                flags.configs.hue2Upper = Convert.ToInt32(str[3]);
+                flags.configs.saturation1Lower = Convert.ToInt32(str[4]);
+                flags.configs.saturation2Lower = Convert.ToInt32(str[5]);
+                flags.configs.valueLower = Convert.ToInt32(str[6]);
+                flags.configs.areaLower = Convert.ToInt32(str[7]);
+                fsRead.Close();
+            }
+        }
+
+        private void button_Continue_Click(object sender, EventArgs e)
+        {
+            if (game.state == GameState.End)
+                game.nextStage();
+            buttonPause.Enabled = false;
+            buttonStart.Enabled = true;
+            button_AReset.Enabled = false;
+            button_BReset.Enabled = false;
+        }
+
+        private void button_AFoul1_Click(object sender, EventArgs e)
+        {
+            game.AFoul1++;
+            game.addScore(Camp.CampA, -10);
+        }
+
+        private void button_AFoul2_Click(object sender, EventArgs e)
+        {
+            game.AFoul2++;
+            game.addScore(Camp.CampA, -50);
+        }
+
+        private void button_BFoul1_Click(object sender, EventArgs e)
+        {
+            game.BFoul1++;
+            game.addScore(Camp.CampB, -10);
+        }
+
+        private void button_BFoul2_Click(object sender, EventArgs e)
+        {
+            game.BFoul2++;
+            game.addScore(Camp.CampB, -50);
+            
+        }
+
+        //绘制乘客信息
+        private void groupBox_Passenger_Paint(object sender, PaintEventArgs e)
+        {
+            Brush br_No_NV = new SolidBrush(Color.Silver);
+            Brush br_No_V = new SolidBrush(Color.DimGray);
+            Brush br_A_NV = new SolidBrush(Color.Pink);
+            Brush br_A_V = new SolidBrush(Color.Red);
+            Brush br_B_NV = new SolidBrush(Color.SkyBlue);
+            Brush br_B_V = new SolidBrush(Color.RoyalBlue);
+            Graphics gra = e.Graphics;
+            int vbargin = 100;
+            for(int i = 0;i!=game.CurrPassengerNumber;++i)
+            {
+                switch(game.Passengers[i].Owner)
+                {
+                    case Camp.None:
+                        gra.FillEllipse(br_No_V, 40, 100 + i * vbargin, 30, 30);
+                        gra.FillEllipse(br_A_NV, 100, 100 + i * vbargin, 30, 30);
+                        gra.FillEllipse(br_B_NV, 160, 100 + i * vbargin, 30, 30);
+                        break;
+                    case Camp.CampA:
+                        gra.FillEllipse(br_No_NV, 40, 100 + i * vbargin, 30, 30);
+                        gra.FillEllipse(br_A_V, 100, 100 + i * vbargin, 30, 30);
+                        gra.FillEllipse(br_B_NV, 160, 100 + i * vbargin, 30, 30);
+                        break;
+                    case Camp.CampB:
+                        gra.FillEllipse(br_No_NV, 40, 100 + i * vbargin, 30, 30);
+                        gra.FillEllipse(br_A_NV, 100, 100 + i * vbargin, 30, 30);
+                        gra.FillEllipse(br_B_V, 160, 100 + i * vbargin, 30, 30);
+                        break;
+                    default:break;
+                }
+            }
         }
     }
 
@@ -556,7 +546,7 @@ namespace EDC20HOST
             configs = new LocConfigs();
             posCarA = new Point2i();
             posCarB = new Point2i();
-            showSize = new OpenCvSharp.Size(640, 480);
+            showSize = new OpenCvSharp.Size(720, 540);
             cameraSize = new OpenCvSharp.Size(1280, 960);
             logicSize = new OpenCvSharp.Size(270, 270);
             clickCount = 0;

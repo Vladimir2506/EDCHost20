@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EDC20HOST
 {
-    class Car //选手的车
+    public class Car //选手的车
     {
         public const int PunishScore = 100; //惩罚分数
         public Dot Pos;
