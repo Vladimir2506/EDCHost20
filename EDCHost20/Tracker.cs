@@ -39,7 +39,7 @@ namespace EDC20HOST
         private CaiNetwork.CaiUDP udp;
 
         private string[] gametext = { "上半场", "下半场", "加时1", "加时2",
-            "加时3", "加时4", "加时5", "加时6", "加时7" };
+            "加时3", "加时4", "加时5", "加时6", "加时7" , "加时8", "加时9", "加时10", "加时11", "加时12"};
         private Camp[] UI_LastRoundCamp = new Camp[5];
 
         public Dot CarALocation()
@@ -74,11 +74,6 @@ namespace EDC20HOST
             newX = labelBScore.Location.X - label_BlueBG.Location.X;
             newY = labelBScore.Location.Y - label_BlueBG.Location.Y;
             labelBScore.Location = new System.Drawing.Point(newX, newY);
-            label_BlueBG.Controls.Add(label_CountDown);
-            newX = label_CountDown.Location.X - label_BlueBG.Location.X;
-            newY = label_CountDown.Location.Y - label_BlueBG.Location.Y;
-            label_CountDown.Location = new System.Drawing.Point(newX, newY);
-            label_RedBG.Controls.Add(label_GameCount);
             label_GameCount.Text = "上半场";
 
             InitialCaiServer();
@@ -115,7 +110,7 @@ namespace EDC20HOST
                 capture.FrameWidth = flags.cameraSize.Width;
                 capture.FrameHeight = flags.cameraSize.Height;
                 capture.ConvertRgb = true;
-                timer100ms.Interval = 90;
+                timer100ms.Interval = 75;
                 timer100ms.Start();
                 //Cv2.NamedWindow("binary");
             }
@@ -147,8 +142,6 @@ namespace EDC20HOST
                 }
             }
             byte[] Message = game.PackMessage();
-            string a = BitConverter.ToString(Message, 0);
-            // labelMsg.Text = a;
             label_CountDown.Text = Convert.ToString(game.Round);
             CaiZhuo_SendBytesViaNet(Message);
             ShowMessage(Message);
@@ -355,10 +348,12 @@ namespace EDC20HOST
             {
                 if (flags.videomode == false)
                 {
-                    vw = new VideoWriter("../../video/" + DateTime.Now.ToString("MMdd_HH_mm_ss") + ".avi",
+                    string time = DateTime.Now.ToString("MMdd_HH_mm_ss");
+                    vw = new VideoWriter("../../video/" + time + ".avi",
                         FourCC.XVID, 10.0, flags.showSize);
                     flags.videomode = true;
                     ((Button)sender).Text = "停止录像";
+                    game.FoulTimeFS = new FileStream("../../video/" + time + ".txt", FileMode.CreateNew);
                 }
                 else
                 {
@@ -366,6 +361,7 @@ namespace EDC20HOST
                     vw = null;
                     flags.videomode = false;
                     ((Button)sender).Text = "开始录像";
+                    game.FoulTimeFS = null;
                 }
             }
         }
@@ -439,8 +435,8 @@ namespace EDC20HOST
 
         private void button_Continue_Click(object sender, EventArgs e)
         {
-            if (game.state == GameState.End)
-                game.nextStage();
+            //if (game.state == GameState.End)
+            game.nextStage();
             buttonPause.Enabled = false;
             buttonStart.Enabled = true;
             button_AReset.Enabled = false;
@@ -451,25 +447,44 @@ namespace EDC20HOST
         {
             game.AFoul1++;
             game.addScore(Camp.CampA, -10);
+            if (game.FoulTimeFS != null)
+            {
+                byte[] data = Encoding.Default.GetBytes($"A -10 {game.Round}\r\n");
+                game.FoulTimeFS.Write(data, 0, data.Length);
+            }
         }
 
         private void button_AFoul2_Click(object sender, EventArgs e)
         {
             game.AFoul2++;
             game.addScore(Camp.CampA, -50);
+            if (game.FoulTimeFS != null)
+            {
+                byte[] data = Encoding.Default.GetBytes($"A -50 {game.Round}\r\n");
+                game.FoulTimeFS.Write(data, 0, data.Length);
+            }
         }
 
         private void button_BFoul1_Click(object sender, EventArgs e)
         {
             game.BFoul1++;
             game.addScore(Camp.CampB, -10);
+            if (game.FoulTimeFS != null)
+            {
+                byte[] data = Encoding.Default.GetBytes($"B -10 {game.Round}\r\n");
+                game.FoulTimeFS.Write(data, 0, data.Length);
+            }
         }
 
         private void button_BFoul2_Click(object sender, EventArgs e)
         {
             game.BFoul2++;
             game.addScore(Camp.CampB, -50);
-            
+            if (game.FoulTimeFS != null)
+            {
+                byte[] data = Encoding.Default.GetBytes($"B -50 {game.Round}\r\n");
+                game.FoulTimeFS.Write(data, 0, data.Length);
+            }
         }
 
         //绘制乘客信息
@@ -546,7 +561,7 @@ namespace EDC20HOST
             configs = new LocConfigs();
             posCarA = new Point2i();
             posCarB = new Point2i();
-            showSize = new OpenCvSharp.Size(720, 540);
+            showSize = new OpenCvSharp.Size(960, 720);
             cameraSize = new OpenCvSharp.Size(1280, 960);
             logicSize = new OpenCvSharp.Size(270, 270);
             clickCount = 0;

@@ -30,6 +30,7 @@ namespace EDC20HOST
         public PassengerGenerator Generator { get; set; }
         public int CurrPassengerNumber; //当前乘客数量
         public static bool[,] GameMap = new bool[MaxSize, MaxSize]; //地图信息
+        public FileStream FoulTimeFS;
         public static bool PassengerDotValid(Dot dot)//新规则直接输出点
         {
             //return true;
@@ -90,6 +91,7 @@ namespace EDC20HOST
             state = GameState.Unstart;
             InitialPassenger(100);
             DebugMode = false;
+            FoulTimeFS = null;
         }
 
         public void nextStage()
@@ -99,10 +101,17 @@ namespace EDC20HOST
                 MaxRound = 600;
             else
                 MaxRound = 1200;
+            CarA.FinishCarry(false);
+            CarB.FinishCarry(false);
             Round = 0;
             state = GameState.Unstart;
             InitialPassenger(100);
             DebugMode = false;
+            if (FoulTimeFS != null)
+            {
+                byte[] data = Encoding.Default.GetBytes($"nextStage\r\n");
+                FoulTimeFS.Write(data, 0, data.Length);
+            }
         }
 
         protected void InitialPassenger(int num)//初始化乘客
