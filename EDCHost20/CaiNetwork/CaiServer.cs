@@ -14,7 +14,7 @@ namespace CaiNetwork
     {
         IPAddress m_localIP;
         int m_localPort;
-        int maxClientNum ;
+        int maxClientNum;
         TcpListener m_listener;
         List<CaiReadWriteObject> clientList = new List<CaiReadWriteObject>();
         bool isExit;
@@ -115,10 +115,16 @@ namespace CaiNetwork
 
         public void GroupSend(byte[] sendBytes)
         {
-            foreach (CaiReadWriteObject client in clientList)
+            int num = clientList.Count;
+            try
             {
-                SendBytes(client, sendBytes);
+                for (int i = 0;i!=num;++i)
+                {
+                    CaiReadWriteObject client = clientList[i];
+                    SendBytes(client, sendBytes);
+                }
             }
+            catch (Exception) { }
         }
 
         public int getPort()

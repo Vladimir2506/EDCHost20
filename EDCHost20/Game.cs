@@ -8,13 +8,21 @@ using System.IO;
 namespace EDC20HOST
 {
     public enum GameState { Unstart = 0, Normal = 1, Pause = 2, End = 3 };
-    class Game
+    public class Game
     {
         public bool DebugMode; //调试模式，最大回合数 = 1,000,000
         public const int MaxSize = 270;
         public const int MaxPassenger = 5;
         public const int MinCarryDistance = 10; //最小接送距离
         public const int BackRound = 50; //回溯回合数
+        public int APauseNum = 0;
+        public int BPauseNum = 0;
+        public int AFoul1 = 0;
+        public int AFoul2 = 0;
+        public int BFoul1 = 0;
+        public int BFoul2 = 0;
+        public int MaxRound;  //最大回合数
+        public int GameCount; //上下半场、加时等
         public int Round { get; set; }//当前回合
         public GameState state { get; set; }
         public Car CarA, CarB;
@@ -54,9 +62,9 @@ namespace EDC20HOST
             for (int i = 0; i != MaxSize; ++i)
                 for (int j = 0; j != MaxSize; ++j)
                     if (buffer[(i * MaxSize + j) * 3 + 2 * i] > 128)//白色
-                        GameMap[i, j] = true;
+                        GameMap[j, i] = true;
                     else
-                        GameMap[i, j] = false;
+                        GameMap[j, i] = false;
         }
         public static StartDestDot OppoDots(StartDestDot prevDot)
         {
@@ -73,20 +81,40 @@ namespace EDC20HOST
         }
         public Game()
         {
+            GameCount = 1;
+            MaxRound = 1200;
             CarA = new Car(Camp.CampA);
             CarB = new Car(Camp.CampB);
             Passengers = new Passenger[MaxPassenger];
             Round = 0;
             state = GameState.Unstart;
+            InitialPassenger(100);
+            DebugMode = false;
+        }
+
+        public void nextStage()
+        {
+            ++GameCount;
+            if (GameCount >= 3)
+                MaxRound = 600;
+            else
+                MaxRound = 1200;
+            Round = 0;
+            state = GameState.Unstart;
+            InitialPassenger(100);
+            DebugMode = false;
+        }
+
+        protected void InitialPassenger(int num)//初始化乘客
+        {
             Generator = new PassengerGenerator();
-            Generator.Generate(500);
+            Generator.Generate(num);
             Passengers[0] = new Passenger(Generator.NextA(), false, 1);
             Passengers[1] = new Passenger(Generator.NextB(), false, 2);
             Passengers[2] = new Passenger(Generator.NextA(), false, 3);
             Passengers[3] = new Passenger(Generator.NextB(), false, 4);
             Passengers[4] = new Passenger(Generator.NextS(), true, 5);
             CheckPassengerNumber();
-            DebugMode = false;
         }
         protected void CheckPassengerNumber() //根据回合数更改最大乘客数量
         {
@@ -94,11 +122,11 @@ namespace EDC20HOST
             {
                 CurrPassengerNumber = 2;
             }
-            else if (Round == 400)
+            else if (Round == MaxRound/3)
             {
                 CurrPassengerNumber = 4;
             }
-            else if (Round == 800)
+            else if (Round == MaxRound/3*2)
             {
                 CurrPassengerNumber = 5;
             }
@@ -163,23 +191,40 @@ namespace EDC20HOST
             {
                 case Camp.CampA:
                     Bget = true;
+                    ++APauseNum;
                     break;
                 case Camp.CampB:
                     Aget = true;
+                    ++BPauseNum;
                     break;
             }
-            if(CarA.People!=null)
+            if (CarA.People != null)
             {
                 int currNum = CarA.People.Number;
-                CarA.FinishCarry(Aget);
+                if (Aget)
+                {
+                    int s = (CarA.People.Score() > BPauseNum * 50) ? CarA.People.Score() : BPauseNum * 50;
+                    addScore(Camp.CampA, s);
+                }
+                CarA.FinishCarry(false);
                 NewPassenger(currNum);
             }
+            else if (Aget)
+                addScore(Camp.CampA, BPauseNum * 50);
+                
             if (CarB.People != null)
             {
                 int currNum = CarB.People.Number;
-                CarB.FinishCarry(Bget);
+                if (Bget)
+                {
+                    int s = (CarB.People.Score() > APauseNum * 50) ? CarB.People.Score() : APauseNum * 50;
+                    addScore(Camp.CampB, s);
+                }
+                CarB.FinishCarry(false);
                 NewPassenger(currNum);
             }
+            else if (Bget)
+                addScore(Camp.CampB, APauseNum * 50);
         }
         public void Update()//每回合执行
         {
